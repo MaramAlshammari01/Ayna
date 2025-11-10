@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صفحة هبوط وتوثيق مدمجة - عون المزرعة إلى المائدة</title>
+    <!-- Bootstrap 5 CSS (RTL compatible via dir="rtl") -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Lucide Icons (للأيقونات) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* تعريفات متغيرات Bootstrap المخصصة للتنسيق */
+        :root {
+            --bs-fresh-green: #38a169; /* Primary/Growth */
+            --bs-harvest-gold: #e8a21f; /* Secondary/Donation */
+            --bs-earth-brown: #5c3b1a; /* Accent/Soil */
+            --bs-earth-dark: #37291a; /* Footer Background */
+
+            /* تجاوز ألوان Bootstrap المخصصة */
+            --bs-primary: var(--bs-fresh-green);
+            --bs-primary-rgb: 56, 161, 105;
+            --bs-body-color: var(--bs-earth-brown);
+            --bs-border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        /* فئات مساعدة لمحاكاة ألوان Tailwind */
+        .bg-fresh-green { background-color: var(--bs-fresh-green) !important; }
+        .text-fresh-green { color: var(--bs-fresh-green) !important; }
+        .btn-fresh-green {
+            /* تعديل الزر ليتطابق مع تدرج الألوان المطلوب */
+            background: linear-gradient(to right, var(--bs-fresh-green), var(--bs-harvest-gold));
+            color: #fff !important;
+            border-color: var(--bs-fresh-green) !important;
+        }
+        .btn-fresh-green:hover { opacity: 0.9; }
+        .btn-outline-fresh-green {
+            color: var(--bs-fresh-green) !important;
+            border-color: var(--bs-fresh-green) !important;
+        }
+        .btn-outline-fresh-green:hover {
+            background-color: var(--bs-fresh-green) !important;
+            color: #fff !important;
+        }
+
+        .text-harvest-gold { color: var(--bs-harvest-gold) !important; }
+        .text-earth-brown { color: var(--bs-earth-brown) !important; }
+        .bg-earth-dark { background-color: var(--bs-earth-dark) !important; }
+
+        /* الظلال المخصصة للبطاقات وتأثيرات التحويم */
+        .shadow-soft { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06); }
+        .card-hover:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* تأثيرات تدرج النص */
+        .text-gradient-earth {
+            background: linear-gradient(to right, var(--bs-fresh-green), var(--bs-harvest-gold), var(--bs-earth-brown));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .text-gradient-hero {
+            background: linear-gradient(to right, var(--bs-fresh-green), var(--bs-harvest-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* خلفية البطل مع طبقة التعتيم */
+        .hero-bg-placeholder {
+            /* Placeholder image representing a fresh field */
+            background-image: url('https://placehold.co/1200x800/d4edda/2a8a4f?text=حقول+القمح+الطازج');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 80vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 0;
+            /* محاكاة تعتيم الخلفية عبر لون الخلفية والشفافية */
+            background: rgba(255, 255, 255, 0.85);
+        }
+        .stats123 {
+            background: #ffffff78;
+            border-radius: 23px;
+            margin: auto;
+        }
+
+        /* الأنماط المخصصة لفئات المرافق (مع تعديل هامش البداية/النهاية عند الضرورة في RTL) */
+        .space-y-2 > * + * { margin-top: 0.5rem; }
+        .space-y-3 > * + * { margin-top: 0.75rem; }
+
+        .icon-bg-fresh-green { background-color: rgba(var(--bs-primary-rgb), 0.1); }
+        .icon-bg-harvest-gold { background-color: rgba(232, 162, 31, 0.1); }
+        .icon-bg-earth-brown { background-color: rgba(92, 59, 26, 0.1); }
+
+        .active-nav {
+            background: #ffe998;
+            padding: 0 12px;
+            color: var(--bs-earth-dark) !important;
+            border-radius: 5px;
+            margin-inline-end: 10px; /* استخدام margin-inline-end لـ RTL */
+        }
+
+        /* تعديلات RTL محددة */
+        .ms-2-rtl { margin-right: 0.5rem !important; }
+        .me-2-rtl { margin-left: 0.5rem !important; }
+
+        /* AUTHENTICATION FORM STYLES (FROM auth-rtl.html) */
+        .auth-card {
+            border: none;
+            border-radius: 1rem;
+            box-shadow: none; /* Shadow removed as it's in a modal */
+            max-width: 450px;
+            width: 100%;
+        }
+        .btn-green {
+            background-color: #4CAF50;
+            border-color: #4CAF50;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .btn-green:hover {
+            background-color: #388E3C;
+            border-color: #388E3C;
+        }
+        .form-control-icon {
+            padding-right: 2.25rem !important; /* Adjust padding for icon on the right in RTL */
+            padding-left: 0.75rem !important;
+        }
+        .form-icon-rtl {
+            position: absolute;
+            top: 50%;
+            right: 0.75rem; /* Position icon on the right */
+            transform: translateY(-50%);
+            color: #6c757d; /* muted-foreground */
+            pointer-events: none;
+            width: 1rem;
+            height: 1rem;
+        }
+        /* Toast styles (minimal simulation) */
+        .toast-container {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1080;
+        }
+    </style>
+</head>
+<body class="bg-light min-vh-100">
+
+<!-- شريط التنقل -->
+<nav class="navbar navbar-expand-md navbar-light bg-light sticky-top shadow-sm" style="--bs-bg-opacity: .95; backdrop-filter: blur(5px);">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <!-- استخدام أيقونة Lucide بدلاً من صورة وهمية -->
+            <i data-lucide="leaf" class="h-8 w-8 text-fresh-green ms-2-rtl"></i>
+            <span class="fs-5 fw-bold text-gradient-earth">عون المزرعة إلى المائدة</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="تبديل التنقل">
+            <i data-lucide="menu"></i>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- روابط التنقل لسطح المكتب -->
+            <ul class="navbar-nav mx-auto mb-2 mb-md-0 d-none d-md-flex">
+                <li class="nav-item active-nav"><a class="nav-link text-earth-brown text-decoration-none fw-medium" href="#">الرئيسية</a></li>
+                <li class="nav-item"><a class="nav-link text-earth-brown text-decoration-none fw-medium" href="#user-types">تصفح المحاصيل</a></li>
+                <li class="nav-item"><a class="nav-link text-earth-brown text-decoration-none fw-medium" href="#how-it-works">كيف نعمل</a></li>
+                <li class="nav-item"><a class="nav-link text-earth-brown text-decoration-none fw-medium" href="#footer">حولنا</a></li>
+            </ul>
+
+            <!-- أزرار المصادقة -->
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-mode="signIn">تسجيل الدخول</button>
+                <button type="button" class="btn btn-fresh-green btn-sm" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-mode="signUp">ابدأ الآن</button>
+            </div>
+
+            <!-- روابط التنقل وأزرار المصادقة للجوال -->
+            <div class="d-block d-md-none border-top mt-3 pt-3">
+                <a class="dropdown-item text-earth-brown fw-medium active-nav" href="#" data-bs-toggle="collapse" data-bs-target="#navbarNav">الرئيسية</a>
+                <a class="dropdown-item text-earth-brown fw-medium" href="#user-types" data-bs-toggle="collapse" data-bs-target="#navbarNav">تصفح المحاصيل</a>
+                <a class="dropdown-item text-earth-brown fw-medium" href="#how-it-works" data-bs-toggle="collapse" data-bs-target="#navbarNav">كيف نعمل</a>
+                <a class="dropdown-item text-earth-brown fw-medium" href="#footer" data-bs-toggle="collapse" data-bs-target="#navbarNav">حولنا</a>
+
+                <div class="mt-3">
+                    <button type="button" class="btn btn-outline-secondary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-mode="signIn">تسجيل الدخول</button>
+                    <button type="button" class="btn btn-fresh-green w-100" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-mode="signUp">ابدأ الآن</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- قسم البطل (Hero) -->
+<section class="hero-bg-placeholder position-relative overflow-hidden">
+    <div class="hero-overlay"></div>
+    <div class="container position-relative z-1 py-5 py-lg-7">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="space-y-4">
+                    <h1 class="display-4 fw-bold lh-sm mb-4">
+                        <span class="text-gradient-hero">نربط المزارع</span>
+                        <br>
+                        بـ
+                        <span class="text-gradient-hero">المجتمعات</span>
+                    </h1>
+                    <p class="lead text-muted max-w-lg mb-5">
+                        سد الفجوة بين فائض المحاصيل والمحتاجين. تمكين المزارعين، وتسهيل التبرعات، ودعم الجمعيات الخيرية لإنشاء نظام بيئي مستدام للغذاء.
+                    </p>
+                </div>
+
+                <div class="d-flex flex-column flex-sm-row gap-3 mb-5">
+                    <button type="button" class="btn btn-fresh-green btn-lg" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-mode="signUp">
+                        ابدأ التبرع <i data-lucide="arrow-left" class="me-2-rtl"></i> <!-- تم عكس السهم ليتناسب مع RTL -->
+                    </button>
+                    <a href="#how-it-works" class="btn btn-outline-fresh-green btn-lg">
+                        اعرف المزيد
+                    </a>
+                </div>
+            </div>
+        </div>
+        <!-- الإحصائيات (تم تحريكها لتكون أسفل العنوان الرئيسي كما كانت في الإصدار السابق) -->
+        <div class="row pt-4 col-md-9 mt-4 pb-4 border-top border-secondary-subtle stats123">
+            <div class="col-4 text-center">
+                <div class="icon-bg-fresh-green rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-2" style="width: 48px; height: 48px;">
+                    <i data-lucide="sprout" class="h-6 w-6 text-fresh-green"></i>
+                </div>
+                <div class="fs-4 fw-bold text-fresh-green">500+</div>
+                <div class="small text-muted">مزارعين</div>
+            </div>
+            <div class="col-4 text-center">
+                <div class="icon-bg-harvest-gold rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-2" style="width: 48px; height: 48px;">
+                    <i data-lucide="heart" class="h-6 w-6 text-harvest-gold"></i>
+                </div>
+                <div class="fs-4 fw-bold text-harvest-gold">10K+</div>
+                <div class="small text-muted">تبرعات</div>
+            </div>
+            <div class="col-4 text-center">
+                <div class="icon-bg-earth-brown rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-2" style="width: 48px; height: 48px;">
+                    <i data-lucide="users" class="h-6 w-6 text-earth-brown"></i>
+                </div>
+                <div class="fs-4 fw-bold text-earth-brown">100+</div>
+                <div class="small text-muted">جمعيات خيرية</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- قسم بطاقات نوع المستخدم -->
+<section id="user-types" class="py-5 py-lg-7 bg-white">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold mb-3">
+                اختر <span class="text-gradient-earth">دورك</span>
+            </h2>
+            <p class="lead text-muted max-w-2xl mx-auto">
+                سواء كنت تزرع أو تتبرع أو توزع، انضم إلى مجتمعنا الذي يعمل معًا لتقليل هدر الطعام ودعم المحتاجين.
+            </p>
+        </div>
+
+        <div class="row justify-content-center g-4">
+            <!-- بطاقة المزارع -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 rounded-3 shadow-soft card-hover" style="background-color: var(--bs-light);">
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="text-center mb-4">
+                            <div class="icon-bg-fresh-green rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 64px; height: 64px;">
+                                <i data-lucide="sprout" class="h-8 w-8 text-fresh-green"></i>
+                            </div>
+                            <h3 class="fs-4 fw-bold mb-2">أنا مزارع</h3>
+                            <p class="text-muted small leading-relaxed">شارك فائض محاصيلك وتواصل مباشرة مع المتبرعين والجمعيات الخيرية. حول حصادك الفائض إلى دعم مجتمعي.</p>
+                        </div>
+
+                        <ul class="list-unstyled space-y-3 mb-4">
+                            <li class="d-flex align-items-start">
+                                <div class="rounded-circle bg-fresh-green mt-2 ms-2 flex-shrink-0" style="width: 8px; height: 8px;"></div>
+                                <span class="small">إدراج فائض المحاصيل للتبرع</span>
+                            </li>
+                            <li class="d-flex align-items-start">
+                                <div class="rounded-circle bg-fresh-green mt-2 ms-2 flex-shrink-0" style="width: 8px; height: 8px;"></div>
+                                <span class="small">استلام مدفوعات مباشرة من المتبرعين</span>
+                            </li>
+                            <li class="d-flex align-items-start">
+                                <div class="rounded-circle bg-fresh-green mt-2 ms-2 flex-shrink-0" style="width: 8px; height: 8px;"></div>
+                                <span class="small">التواصل مع الجمعيات الخيرية المحلية</span>
+                            </li>
+                            <li class="d-flex align-items-start">
+                                <div class="rounded-circle bg-fresh-green mt-2 ms-2 flex-shrink-0" style="width: 8px; height: 8px;"></div>
+                                <span class="small">تتبع أثر التبرعات</span>
+                            </li>
+                        </ul>
+
+                        <button type="button" class="btn btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-mode="signUp">
+                            ابدأ الآن <i data-lucide="arrow-left" class="me-2-rtl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- بطاقة المتبرع -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 rounded-3 shadow-soft card-hover" style="background-color: var(--bs-light);">
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="text-center mb-4">
+                            <div class="icon-bg-harvest-gold rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 64px; height: 64px;">
+                                <i data-lucide="heart" class="h-8 w-8 text-harvest-gold"></i>
+                            </div>
+                            <h3 class="fs-4 fw-bold mb-2">أرغب في التبرع</h3>
+                            <p class="text-muted small leading-relaxed">ادعم المزارعين والمجتمعات المحلية بشراء سلال المحاصيل التي تذهب مباشرة للجمعيات الخيرية المحتاجة.</p>
+                        </div>
+
+                        <ul class="list-unstyled space-y-3 mb-4">
+                            <li class="d-flex align-items-start">
+                                <div class="rounded-circle bg-harvest-gold mt-2 ms-2 flex-shrink-0" style="width: 8px; height: 8px;"></div>
+                                <span class="small">تصفح المحاصيل المتاحة</span>
+                            </li>
+                            <li class="d-flex align-items-start">
+                                <div class="rounded-circle bg-harvest-gold mt-2 ms-2 flex-shrink-0" style="width: 8px; height: 8px;"></div>
+                                <span class="small">الدفع للمزارعين مباشرة بالبطاقة</span>
+                            </li>
+                            <li class="d-flex align-items-start">
+                                <div class="rounded-circle bg-harvest-gold mt-2 ms-2 flex-shrink-0" style="width: 8px; height: 8px;"></div>
+                                <span class="small">تتبع تبرعاتك حتى التسليم</span>
+                            </li>
+                            <li class="d-flex align-items-start">
+                                <div class="rounded-circle bg-harvest-gold mt-2 ms-2 flex-shrink-0" style="width: 8px; height: 8px;"></div>
+                                <span class="small">شاهد الأثر الحقيقي على المجتمعات</span>
+                            </li>
+                        </ul>
+
+                        <button type="button" class="btn btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-mode="signUp">
+                            ابدأ الآن <i data-lucide="arrow-left" class="me-2-rtl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- بطاقة الجمعية الخيرية -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 rounded-3 shadow-soft card-hover" style="background-color: var(--bs-light);">
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="text-center mb-4">
+                            <div class="icon-bg-earth-brown rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 64px; height: 64px;">
+                                <i data-lucide="building-2" class="h-8 w-8 text-earth-brown"></i>
+                            </div>
+                            <h3 class="fs-4 fw-bold mb-2">أنا جمعية خيرية</h3>
+                            <p class="text-muted small leading-relaxed">استلم تبرعات المنتجات الطازجة من المزارعين المحليين ونسق عملية الاستلام لخدمة مجتمعك.</p>
+                        </div>
+
+                        <ul class="list-unstyled space-y-3 mb-4">
+                            <li class="d-flex align-items-start">
+                                <div class="rounded-circle bg-earth-brown mt-2 ms-2 flex-shrink-0" style="width: 8px; height: 8px;"></div>
+                                <span class="small">عرض طلبات التبرع من المزارعين</span>
+                            </li>
+                            <li class="d-flex align-items-start">
+                                <div class="rounded-circle bg-earth-brown mt-2 ms-2 flex-shrink-0" style="width: 8px; height: 8px;"></div>
+                                <span class="small">قبول التبرعات بناءً على الاحتياجات</span>
+                            </li>
+                            <li class="d-flex align-items-start">
+                                <div class="rounded-circle bg-earth-brown mt-2 ms-2 flex-shrink-0" style="width: 8px; height: 8px;"></div>
+                                <span class="small">ترتيب لوجستيات الاستلام</span>
+                            </li>
+                            <li class="d-flex align-items-start">
+                                <div class="rounded-circle bg-earth-brown mt-2 ms-2 flex-shrink-0" style="width: 8px; height: 8px;"></div>
+                                <span class="small">توزيعها على أفراد المجتمع</span>
+                            </li>
+                        </ul>
+
+                        <button type="button" class="btn btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-mode="signUp">
+                            ابدأ الآن <i data-lucide="arrow-left" class="me-2-rtl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- قسم كيف نعمل -->
+<section id="how-it-works" class="py-5 py-lg-7">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold mb-3">
+                <span class="text-gradient-earth">كيف نعمل</span>
+            </h2>
+            <p class="lead text-muted max-w-2xl mx-auto">
+                عمليتنا البسيطة المكونة من أربع خطوات تربط فائض المحاصيل بالمجتمعات المحتاجة، مما يخلق دورة مستدامة للعطاء.
+            </p>
+        </div>
+
+        <div class="row justify-content-center g-4">
+            <!-- الخطوة 1 -->
+            <div class="col-md-6 col-lg-3 position-relative">
+                <div class="card h-100 border-0 rounded-3 shadow-soft card-hover">
+                    <div class="card-body p-4 p-lg-2 text-center">
+                        <div class="icon-bg-fresh-green rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-4" style="width: 64px; height: 64px;">
+                            <i data-lucide="sprout" class="h-8 w-8 text-fresh-green"></i>
+                        </div>
+                        <div class="fs-1 fw-bold text-fresh-green mb-3">01</div>
+                        <h3 class="fs-5 fw-bold mb-3">المزارعون يدرجون المحاصيل</h3>
+                        <p class="text-muted small leading-relaxed">المزارعون المحليون يعرضون فائض محاصيلهم أو ينشئون فرص تبرع للمجتمع.</p>
+                    </div>
+                </div>
+                <!-- السهم لـ RTL (تم تعديل موضعه) -->
+                <div class="d-none d-lg-block position-absolute top-50 start-0 translate-middle-x z-1" style="transform: translate(-50%, -50%);">
+                    <i data-lucide="arrow-left" class="h-8 w-8 text-secondary opacity-25"></i>
+                </div>
+            </div>
+
+            <!-- الخطوة 2 -->
+            <div class="col-md-6 col-lg-3 position-relative">
+                <div class="card h-100 border-0 rounded-3 shadow-soft card-hover">
+                    <div class="card-body p-4 p-lg-2 text-center">
+                        <div class="icon-bg-harvest-gold rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-4" style="width: 64px; height: 64px;">
+                            <i data-lucide="heart" class="h-8 w-8 text-harvest-gold"></i>
+                        </div>
+                        <div class="fs-1 fw-bold text-harvest-gold mb-3">02</div>
+                        <h3 class="fs-5 fw-bold mb-3">المتبرعون يختارون ويدفعون</h3>
+                        <p class="text-muted small leading-relaxed">يتصفح المتبرعون المحاصيل المتاحة ويقومون بالدفع الآمن عبر البطاقة.</p>
+                    </div>
+                </div>
+                <!-- السهم لـ RTL (تم تعديل موضعه) -->
+                <div class="d-none d-lg-block position-absolute top-50 start-0 translate-middle-x z-1" style="transform: translate(-50%, -50%);">
+                    <i data-lucide="arrow-left" class="h-8 w-8 text-secondary opacity-25"></i>
+                </div>
+            </div>
+
+            <!-- الخطوة 3 -->
+            <div class="col-md-6 col-lg-3 position-relative">
+                <div class="card h-100 border-0 rounded-3 shadow-soft card-hover">
+                    <div class="card-body p-4 p-lg-2 text-center">
+                        <div class="icon-bg-earth-brown rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-4" style="width: 64px; height: 64px;">
+                            <i data-lucide="credit-card" class="h-8 w-8 text-earth-brown"></i>
+                        </div>
+                        <div class="fs-1 fw-bold text-earth-brown mb-3">03</div>
+                        <h3 class="fs-5 fw-bold mb-3">المزارعون يحصلون على المقابل</h3>
+                        <p class="text-muted small leading-relaxed">تذهب المدفوعات مباشرة للمزارعين، لضمان حصولهم على تعويض عادل لمنتجاتهم.</p>
+                    </div>
+                </div>
+                <!-- السهم لـ RTL (تم تعديل موضعه) -->
+                <div class="d-none d-lg-block position-absolute top-50 start-0 translate-middle-x z-1" style="transform: translate(-50%, -50%);">
+                    <i data-lucide="arrow-left" class="h-8 w-8 text-secondary opacity-25"></i>
+                </div>
+            </div>
+
+            <!-- الخطوة 4 -->
+            <div class="col-md-6 col-lg-3 position-relative">
+                <div class="card h-100 border-0 rounded-3 shadow-soft card-hover">
+                    <div class="card-body p-4 p-lg-2 text-center">
+                        <div class="icon-bg-fresh-green rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-4" style="width: 64px; height: 64px;">
+                            <i data-lucide="truck" class="h-8 w-8 text-fresh-green"></i>
+                        </div>
+                        <div class="fs-1 fw-bold text-fresh-green mb-3">04</div>
+                        <h3 class="fs-5 fw-bold mb-3">التسليم للجمعيات الخيرية</h3>
+                        <p class="text-muted small leading-relaxed">يتم توصيل المحاصيل للجمعيات الخيرية التي توزعها على أفراد المجتمع المحتاجين.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <div class="d-inline-flex align-items-center small text-muted bg-light px-4 py-2 rounded-pill">
+                <i data-lucide="heart" class="h-4 w-4 text-harvest-gold ms-2-rtl"></i>
+                <span>تتبع تبرعك من المزرعة إلى المائدة</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- التذييل (Footer) -->
+<footer id="footer" class="bg-earth-dark text-white py-4 py-lg-7">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4 col-lg-3">
+                <div class="space-y-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <!-- استخدام أيقونة Lucide بدلاً من صورة وهمية -->
+                        <i data-lucide="leaf" class="h-6 w-6 text-fresh-green ms-2-rtl"></i>
+                        <span class="fs-5 fw-bold">عون المزرعة إلى المائدة</span>
+                    </div>
+                    <p class="text-secondary small text-white leading-relaxed">
+                        نربط المزارع بالمجتمعات لتقليل هدر الطعام ودعم المحتاجين.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-2 col-lg-3">
+                <h4 class="fw-semibold mb-3 text-white">روابط سريعة</h4>
+                <ul class="list-unstyled space-y-2 small">
+                    <li><a href="#how-it-works" class="text-secondary text-decoration-none text-white">كيف نعمل</a></li>
+                    <li><a href="#footer" class="text-secondary text-decoration-none text-white">حولنا</a></li>
+                    <li><button type="button" class="btn btn-link text-secondary text-decoration-none p-0 text-white" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-mode="signUp">ابدأ الآن</button></li>
+                </ul>
+            </div>
+
+            <div class="col-6 col-md-3 col-lg-3">
+                <h4 class="fw-semibold mb-3 text-white">للمستخدمين</h4>
+                <ul class="list-unstyled space-y-2 small">
+                    <li><button type="button" class="btn btn-link text-secondary text-decoration-none p-0 text-white" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-mode="signUp">المزارعون</button></li>
+                    <li><button type="button" class="btn btn-link text-secondary text-decoration-none p-0 text-white" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-mode="signUp">المتبرعون</button></li>
+                    <li><button type="button" class="btn btn-link text-secondary text-decoration-none p-0 text-white" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-mode="signUp">الجمعيات الخيرية</button></li>
+                </ul>
+            </div>
+
+            <div class="col-md-3 col-lg-3">
+                <h4 class="fw-semibold mb-3 text-white">تواصل معنا</h4>
+                <div class="space-y-2 small text-secondary">
+                    <div class="d-flex align-items-center text-white">
+                        <i data-lucide="mail" class="h-4 w-4 ms-2-rtl"></i>
+                        <span>hello@farmtoforkaid.com</span>
+                    </div>
+                    <div class="d-flex align-items-center text-white">
+                        <i data-lucide="phone" class="h-4 w-4 ms-2-rtl"></i>
+                        <span>+966523254255</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="border-top border-secondary-subtle mt-1 pt-2 text-center small text-secondary">
+            <p class="mb-0 text-white">&copy; 2025 عون المزرعة إلى المائدة. جميع الحقوق محفوظة.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Toast Container (for mock notifications) -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- *********************************************************************************** -->
+<!-- AUTHENTICATION MODAL - Merged from auth-rtl.html -->
+<!-- *********************************************************************************** -->
+<div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content auth-card">
+            <div class="modal-header border-0 pb-0 d-block text-center">
+                <button type="button" class="btn-close m-0 position-absolute" style="top: 1rem; left: 1rem;" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                <div class="d-flex align-items-center justify-content-center pt-3 mb-2">
+                    <i data-lucide="leaf" class="h-5 w-5 text-fresh-green ms-2"></i>
+                    <span class="fs-5 fw-bold text-gradient-earth">عون المزرعة</span>
+                </div>
+
+                <h2 class="card-title fw-bold" id="card-title">مرحباً بعودتك</h2>
+                <p class="card-text text-muted small" id="card-description">سجّل الدخول إلى حسابك للمتابعة</p>
+            </div>
+
+            <div class="modal-body pt-3">
+                <form id="authForm" class="needs-validation" novalidate>
+
+                    <!-- Dynamic Sign Up Fields Container -->
+                    <div id="signUpFields" class="mb-4" style="display: none;">
+
+                        <!-- First Name & Last Name (Donor/Farmer Entity) -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="first_name" class="form-label">الاسم الأول</label>
+                                <div class="position-relative">
+                                    <i class="fas fa-user-alt form-icon-rtl"></i>
+                                    <input type="text" class="form-control form-control-icon" id="first_name" name="first_name" placeholder="أدخل اسمك الأول">
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="last_name" class="form-label">اسم العائلة</label>
+                                <div class="position-relative">
+                                    <i class="fas fa-user-alt form-icon-rtl"></i>
+                                    <input type="text" class="form-control form-control-icon" id="last_name" name="last_name" placeholder="أدخل اسم عائلتك">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- User Type/Role Select (User Entity) -->
+                        <div class="mb-3">
+                            <label for="role" class="form-label">أنا (نوع المستخدم)</label>
+                            <select class="form-select" id="role" name="role">
+                                <option value="donor" selected>متبرع (Donor)</option>
+                                <option value="farmer">مزارع (Farmer)</option>
+                                <option value="charity">جمعية خيرية (Charity)</option>
+                            </select>
+                        </div>
+
+                        <!-- Gender Select (Donor/Farmer Entity) -->
+                        <div class="mb-3" id="genderGroup">
+                            <label for="gender" class="form-label">النوع (Gender)</label>
+                            <select class="form-select" id="gender" name="gender">
+                                <option value="" disabled selected>اختر النوع...</option>
+                                <option value="male">ذكر</option>
+                                <option value="female">أنثى</option>
+                                <option value="other">أفضل عدم التحديد</option>
+                            </select>
+                        </div>
+
+                        <!-- Phone Number (User Entity) -->
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">رقم الهاتف</label>
+                            <div class="position-relative">
+                                <i class="fas fa-phone form-icon-rtl"></i>
+                                <input type="tel" class="form-control form-control-icon" id="phone" name="phone" placeholder="أدخل رقم هاتفك">
+                            </div>
+                        </div>
+
+                        <!-- Charity Specific Fields (Charity Entity) -->
+                        <div id="charityFields" style="display: none;">
+                            <div class="mb-3">
+                                <label for="char_name" class="form-label">اسم الجمعية (Char_Name)</label>
+                                <div class="position-relative">
+                                    <i class="fas fa-building form-icon-rtl"></i>
+                                    <input type="text" class="form-control form-control-icon" id="char_name" name="char_name" placeholder="أدخل اسم الجمعية">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="char_cr" class="form-label">رقم التسجيل التجاري (Char_CR)</label>
+                                <div class="position-relative">
+                                    <i class="fas fa-registered form-icon-rtl"></i>
+                                    <input type="text" class="form-control form-control-icon" id="char_cr" name="char_cr" placeholder="أدخل رقم التسجيل">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Location/Address (Farmer/Charity Location Entity) -->
+                        <div class="mb-3" id="locationGroup">
+                            <label for="location" class="form-label" id="locationLabel">العنوان</label>
+                            <div class="position-relative">
+                                <i class="fas fa-map-marker-alt form-icon-rtl"></i>
+                                <input type="text" class="form-control form-control-icon" id="location" name="location" placeholder="أدخل عنوانك أو موقع المزرعة/المؤسسة">
+                            </div>
+                        </div>
+
+                        <!-- Bio (Optional) -->
+                        <div class="mb-3">
+                            <label for="bio" class="form-label">نبذة عني (اختياري)</label>
+                            <textarea class="form-control" id="bio" name="bio" rows="2" placeholder="أخبرنا قليلاً عن نفسك..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Email (User Entity) -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label">البريد الإلكتروني</label>
+                        <div class="position-relative">
+                            <i class="fas fa-envelope form-icon-rtl"></i>
+                            <input type="email" class="form-control form-control-icon" id="email" name="email" placeholder="أدخل بريدك الإلكتروني" required>
+                        </div>
+                    </div>
+
+                    <!-- Password (User Entity) -->
+                    <div class="mb-4">
+                        <label for="password" class="form-label">كلمة المرور</label>
+                        <div class="position-relative">
+                            <i class="fas fa-lock form-icon-rtl"></i>
+                            <input type="password" class="form-control form-control-icon" id="password" name="password" placeholder="أدخل كلمة المرور" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-green text-white w-100 py-2 fw-bold" id="submitButton">
+                        تسجيل الدخول
+                    </button>
+                </form>
+
+                <!-- Toggle Link -->
+                <div class="mt-4 text-center">
+                    <p class="text-muted small mb-0" id="toggleText">
+                        ليس لديك حساب؟
+                        <a href="#" class="fresh-green fw-bold text-decoration-none" id="toggleAuthMode">
+                            إنشاء حساب
+                        </a>
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Font Awesome is needed for the form icons in the modal -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+<!-- Scripts for Icons and Form Logic -->
+<script>
+    window.onload = function() {
+        lucide.createIcons();
+    };
+
+    // --- State Management ---
+    let isSignUp = false;
+    let isLoading = false;
+
+    // --- DOM Elements ---
+    const authModalEl = document.getElementById('authModal');
+    const authForm = document.getElementById('authForm');
+    const submitButton = document.getElementById('submitButton');
+    const cardTitle = document.getElementById('card-title');
+    const cardDescription = document.getElementById('card-description');
+    const toggleText = document.getElementById('toggleText');
+    const signUpFields = document.getElementById('signUpFields');
+    const roleSelect = document.getElementById('role');
+    const toastContainer = document.getElementById('toastContainer');
+
+    // ERD-based elements
+    const firstNameInput = document.getElementById('first_name');
+    const lastNameInput = document.getElementById('last_name');
+    const genderSelect = document.getElementById('gender');
+    const phoneInput = document.getElementById('phone');
+
+    const charityFieldsDiv = document.getElementById('charityFields');
+    const charNameInput = document.getElementById('char_name');
+    const charCrInput = document.getElementById('char_cr'); // Commercial Registration
+
+    const locationGroupDiv = document.getElementById('locationGroup');
+    const locationInput = document.getElementById('location');
+    const locationLabel = document.getElementById('locationLabel');
+
+    // --- Utility Functions ---
+
+    /**
+     * Simple Toast/Notification simulation using Bootstrap's component structure.
+     */
+    function showToast(title, description, variant = 'bg-primary') {
+        const toastHtml = `
+                <div class="toast align-items-center ${variant} text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body fw-bold">
+                            ${title}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            `;
+
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = toastHtml;
+        toastContainer.appendChild(wrapper.firstChild);
+
+        const toastEl = toastContainer.lastElementChild;
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+
+        // Clean up DOM after toast is hidden
+        toastEl.addEventListener('hidden.bs.toast', () => {
+            toastEl.remove();
+        });
+    }
+
+    /**
+     * Updates the UI state (titles, buttons, fields visibility).
+     */
+    function updateUI() {
+        // Update Card Header
+        cardTitle.textContent = isSignUp ? 'انضم إلى مجتمعنا' : 'مرحباً بعودتك';
+        cardDescription.textContent = isSignUp
+            ? 'أنشئ حسابك لبدء ربط المزارع بالمجتمعات'
+            : 'سجّل الدخول إلى حسابك للمتابعة';
+
+        // Update Toggle Link
+        toggleText.innerHTML = isSignUp
+            ? `لديك حساب بالفعل؟ <a href="#" class="fresh-green fw-bold text-decoration-none" id="toggleAuthMode">تسجيل الدخول</a>`
+            : `ليس لديك حساب؟ <a href="#" class="fresh-green fw-bold text-decoration-none" id="toggleAuthMode">إنشاء حساب</a>`;
+
+        // Reattach event listener to the new toggle link (must be done after innerHTML change)
+        document.getElementById('toggleAuthMode').addEventListener('click', toggleAuthMode);
+
+        // Update Button Text
+        submitButton.textContent = isLoading ? 'الرجاء الانتظار...' : (isSignUp ? 'إنشاء حساب' : 'تسجيل الدخول');
+        submitButton.disabled = isLoading;
+
+        // Toggle Sign Up Fields container
+        signUpFields.style.display = isSignUp ? 'block' : 'none';
+
+        // Update conditional fields visibility and requirements
+        updateConditionalFields();
+    }
+
+    /**
+     * Updates the visibility and required status of conditional fields based on the selected role.
+     */
+    function updateConditionalFields() {
+        const role = roleSelect.value;
+
+        // 1. Reset all conditional field requirements/visibility
+        firstNameInput.required = false;
+        lastNameInput.required = false;
+        genderSelect.required = false;
+        locationInput.required = false;
+        charNameInput.required = false;
+        charCrInput.required = false;
+        phoneInput.required = false;
+
+        // Default visibility
+        charityFieldsDiv.style.display = 'none';
+        locationGroupDiv.style.display = 'none';
+
+        if (isSignUp) {
+            // Phone is required for all sign-ups based on the User entity
+            phoneInput.required = true;
+
+            // First Name / Last Name / Gender are required for individual accounts (Donor/Farmer)
+            if (role === 'donor' || role === 'farmer') {
+                firstNameInput.required = true;
+                lastNameInput.required = true;
+                genderSelect.required = true;
+
+                locationGroupDiv.style.display = 'block';
+            }
+
+            // Farmer specific fields
+            if (role === 'farmer') {
+                locationInput.required = true;
+                locationLabel.textContent = 'موقع المزرعة (مطلوب)'; // Far_Location
+            } else if (role === 'donor') {
+                locationInput.required = false;
+                locationLabel.textContent = 'العنوان (اختياري)';
+            }
+
+            // Charity specific fields
+            if (role === 'charity') {
+                // Show charity fields
+                charityFieldsDiv.style.display = 'block';
+                locationGroupDiv.style.display = 'block';
+
+                // Charity specific required fields (Char_Name, Char_Location)
+                charNameInput.required = true;
+                locationInput.required = true;
+                locationLabel.textContent = 'موقع الجمعية (مطلوب)'; // Char_Location
+            }
+        }
+    }
+
+    /**
+     * Toggles between Sign In and Sign Up mode.
+     */
+    function toggleAuthMode(e) {
+        e.preventDefault();
+        isSignUp = !isSignUp;
+        // Reset form for clean state transition and remove validation classes
+        authForm.reset();
+        authForm.classList.remove('was-validated');
+
+        // Ensure email/password are marked as required on toggle (always required)
+        document.getElementById('email').required = true;
+        document.getElementById('password').required = true;
+
+        // Update UI which calls updateConditionalFields to set conditional requirements
+        updateUI();
+    }
+
+    /**
+     * Sets initial auth mode based on the button that triggered the modal.
+     */
+    function setInitialAuthMode(mode) {
+        const newIsSignUp = mode === 'signUp';
+        if (newIsSignUp !== isSignUp) {
+            isSignUp = newIsSignUp;
+            authForm.reset();
+            authForm.classList.remove('was-validated');
+            updateUI();
+        }
+    }
+
+    // --- Mock API Functions ---
+
+    async function mockSignIn(email, password) {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                if (email && password) {
+                    if (email === "error@example.com") {
+                        reject(new Error("هذا الحساب محظور مؤقتاً."));
+                    } else {
+                        resolve({ success: true, user: { id: 'mock-user-123' } });
+                    }
+                } else {
+                    reject(new Error("البريد الإلكتروني وكلمة المرور مطلوبان."));
+                }
+            }, 1500);
+        });
+    }
+
+    async function mockSignUp(data) {
+        // Check essential ERD fields based on User_Type
+        if (data.role === 'charity' && (!data.char_name || !data.location)) {
+            return new Promise((resolve, reject) => {
+                reject(new Error("اسم الجمعية وموقعها مطلوبان للتسجيل."));
+            });
+        } else if ((data.role === 'donor' || data.role === 'farmer') && (!data.first_name || !data.last_name || !data.gender)) {
+            return new Promise((resolve, reject) => {
+                reject(new Error("الاسم الأول واسم العائلة والنوع مطلوبان للتسجيل."));
+            });
+        }
+
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                if (data.email === "exists@example.com") {
+                    reject(new Error("البريد الإلكتروني مسجل بالفعل."));
+                } else {
+                    // Log structured data as if sending to backend for all entities
+                    console.log("Mock data payload for backend (User and entity tables):", {
+                        User: {
+                            email: data.email,
+                            phone: data.phone,
+                            type: data.role
+                        },
+                        Entity: data.role === 'donor' ? {
+                            first_name: data.first_name,
+                            last_name: data.last_name,
+                            gender: data.gender,
+                        } : data.role === 'farmer' ? {
+                            first_name: data.first_name,
+                            last_name: data.last_name,
+                            gender: data.gender,
+                            location: data.location,
+                        } : { // Charity
+                            char_name: data.char_name,
+                            char_cr: data.char_cr,
+                            location: data.location,
+                        }
+                    });
+
+                    // Mock success
+                    resolve({ success: true, user: { id: 'mock-new-user-456' } });
+                }
+            }, 2000);
+        });
+    }
+
+    /**
+     * Main form submission handler.
+     */
+    async function handleSubmit(e) {
+        e.preventDefault();
+
+        // Basic Bootstrap validation check
+        if (!authForm.checkValidity()) {
+            e.stopPropagation();
+            authForm.classList.add('was-validated');
+            return;
+        }
+
+        isLoading = true;
+        updateUI();
+
+        const formData = new FormData(authForm);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            if (isSignUp) {
+                await mockSignUp(data);
+
+                showToast('تم إنشاء الحساب بنجاح!', 'يمكنك الآن البدء باستخدام معونة من المزرعة إلى المائدة.', 'bg-success');
+
+                // Close modal on success
+                const modal = bootstrap.Modal.getInstance(authModalEl);
+                if (modal) modal.hide();
+
+            } else {
+                await mockSignIn(data.email, data.password);
+
+                showToast('مرحباً بك مجدداً!', 'تم تسجيل الدخول إلى حسابك بنجاح.', 'bg-success');
+
+                // Close modal on success
+                const modal = bootstrap.Modal.getInstance(authModalEl);
+                if (modal) modal.hide();
+            }
+        } catch (error) {
+            showToast('خطأ في المصادقة', error.message, 'bg-danger');
+            console.error("Auth Error:", error);
+        } finally {
+            isLoading = false;
+            updateUI();
+        }
+    }
+
+    // --- Event Listeners and Initialization ---
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Event listener to set initial mode when modal is shown
+        authModalEl.addEventListener('show.bs.modal', function (event) {
+            // Button that triggered the modal
+            const button = event.relatedTarget;
+            // Extract info from data-auth-mode attributes
+            const authMode = button.getAttribute('data-auth-mode') || 'signIn';
+            setInitialAuthMode(authMode);
+        });
+
+        // Initialize event listeners after DOM is loaded
+        updateUI(); // Initial setup
+        authForm.addEventListener('submit', handleSubmit);
+        roleSelect.addEventListener('change', updateConditionalFields);
+
+        // Hide the modal on successful sign in/up and reset form validation on hide
+        authModalEl.addEventListener('hidden.bs.modal', () => {
+            authForm.classList.remove('was-validated');
+        });
+    });
+
+</script>
+</body>
+</html>

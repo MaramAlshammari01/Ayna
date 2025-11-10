@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم المزارع - عون المزرعة إلى المائدة</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bs-fresh-green: #38a169; /* Primary/Growth */
+            --bs-harvest-gold: #e8a21f; /* Secondary/Donation */
+            --bs-earth-brown: #5c3b1a; /* Accent/Soil */
+            --bs-earth-dark: #37291a; /* Footer Background */
+
+            /* تجاوز ألوان Bootstrap المخصصة */
+            --bs-primary: var(--bs-fresh-green);
+            --bs-primary-rgb: 56, 161, 105;
+            --bs-body-color: var(--bs-earth-brown);
+            --bs-border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            /* الخطوط المطلوبة */
+            font-family: "Amiri", "Noto Naskh Arabic", serif;
+            /*background-color: #f7f9fb;*/
+            /*color: var(--bs-body-color);*/
+            /*padding-top: 80px; !* لترك مسافة لشريط التنقل الثابت *!*/
+        }
+
+        /* تنسيق الشريط العلوي */
+        .navbar-brand img {
+            height: 55px; /* Adjusting height for better fit */
+        }
+
+        /* تنسيق الشريط الجانبي (Sidebar) */
+        .sidebar {
+            width: 250px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            position: fixed;
+            top: 80px; /* يبدأ بعد شريط التنقل العلوي */
+            right: 0; /* Align right for RTL */
+            height: calc(100% - 80px); /* يملأ ما تبقى من الشاشة */
+            z-index: 999;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            border-right: 1px solid var(--bs-border-color);
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(250px); /* Hide by moving outside on the right */
+        }
+
+        .main-content {
+            margin-right: 250px; /* Offset main content for sidebar */
+            padding: 20px;
+            transition: margin-right 0.3s ease;
+        }
+
+        .main-content.expanded {
+            margin-right: 0;
+        }
+        .modal-header .btn-close {
+            margin: 0;
+        }
+        .nav-link.active {
+            background-color: rgba(var(--bs-harvest-gold), 0.1);
+            color: var(--bs-harvest-gold) !important;
+            border-right: 4px solid var(--bs-fresh-green); /* Highlight border on the right */
+        }
+
+        .nav-link {
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--bs-earth-brown);
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+        }
+
+        /* تخصيص زر النمط الأخضر */
+        .btn-fresh-green {
+            background-color: var(--bs-fresh-green) !important;
+            border-color: var(--bs-fresh-green) !important;
+            color: #fff !important;
+            transition: background-color 0.2s;
+        }
+        .btn-fresh-green:hover {
+            background-color: #2f855a !important;
+            border-color: #2f855a !important;
+        }
+
+        /* Box styles */
+        .dashboard-box {
+            background-color: #fff;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(250px); /* Initially hidden on mobile */
+            }
+            .sidebar.show {
+                transform: translateX(0); /* Show when active */
+            }
+            .main-content {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- *********************************************************************************** -->
+<!-- شريط التنقل العام المطلوب (Public Navbar) -->
+<!-- *********************************************************************************** -->
+<nav  class="navbar navbar-expand-md navbar-light  sticky-top shadow-sm" style="--bs-bg-opacity: .95; backdrop-filter: blur(5px); padding: 0;background: #e5fff4 !important;">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <img src="logo.png" height="75">
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="تبديل التنقل">
+            <i data-lucide="menu"></i>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto mb-2 mb-md-0 d-none d-md-flex">
+
+            </ul>
+
+            <div class="d-flex align-items-center gap-2">
+                <!-- Notification Icon (Dashboard specific, but placed here for visibility) -->
+                <button type="button" class="btn btn-outline-secondary btn-sm position-relative">
+                    <i data-lucide="bell" style="width: 20px; height: 20px;"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notificationCount">3</span>
+                </button>
+                <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-mode="signUp"> تسجيل الخروج </button>
+            </div>
+
+            <div class="d-block d-md-none border-top mt-3 pt-3">
+                <div class="d-flex align-items-center gap-2 mt-2">
+                    <button type="button" class="btn btn-fresh-green btn-sm" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-mode="signUp">ابدأ الآن</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+
+<!-- *********************************************************************************** -->
+<!-- FIREBASE SETUP SCRIPT (Mocking initialization based on provided globals) -->
+<!-- *********************************************************************************** -->
+<script type="module">
+    // Mandatory Firebase imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // Global variables provided by the Canvas environment
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+    let app, db, auth;
+    let userId = 'mock-farmer-user-id'; // Default mock ID for display
+
+    try {
+        app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        auth = getAuth(app);
+
+        console.log("Firebase initialized successfully.");
+
+        // Authentication logic
+        async function authenticate() {
+            try {
+                if (initialAuthToken) {
+                    const userCredential = await signInWithCustomToken(auth, initialAuthToken);
+                    userId = userCredential.user.uid;
+                    console.log("Signed in with custom token:", userId);
+                } else {
+                    const userCredential = await signInAnonymously(auth);
+                    userId = userCredential.user.uid;
+                    console.log("Signed in anonymously:", userId);
+                }
+            } catch (error) {
+                console.error("Firebase Auth Error:", error);
+                // Fallback to anonymous or mock data
+            }
+        }
+
+        authenticate();
+
+    } catch (error) {
+        console.error("Firebase Initialization Failed:", error);
+    }
+
+    // Expose necessary variables globally for simulation/testing
+    window.db = db;
+    window.auth = auth;
+    window.userId = userId;
+
+    // Mock Farmer Data Store (to be replaced by Firestore logic)
+    window.farmerState = {
+        farmerDetails: {
+            Far_FirstName: "علي",
+            Far_LastName: "الخضراوي",
+            User_Type: "مزارع",
+            Far_ID: "FAR-001",
+            User_ID: userId
+        },
+        crops: [
+            { Cro_ID: 'CR001', Cro_Name: 'طماطم', Cro_Type: 'خضار', Cro_Weight: 50, Cro_Qty: 200, Cro_ShelfLife: '14 يوم', Far_ID: 'FAR-001' },
+            { Cro_ID: 'CR002', Cro_Name: 'خيار', Cro_Type: 'خضار', Cro_Weight: 30, Cro_Qty: 150, Cro_ShelfLife: '7 أيام', Far_ID: 'FAR-001' },
+            { Cro_ID: 'CR003', Cro_Name: 'تفاح', Cro_Type: 'فاكهة', Cro_Weight: 10, Cro_Qty: 50, Cro_ShelfLife: '30 يوم', Far_ID: 'FAR-001' },
+        ],
+        baskets: [
+            { Bas_ID: 'BAS001', Bas_Content: 'سلة الخضروات اليومية', Bas_Price: 50, Bas_Qty: 10, Far_ID: 'FAR-001', crops: [{ Cro_Name: 'طماطم', Cro_Qty: 5 }, { Cro_Name: 'خيار', Cro_Qty: 3 }] },
+            { Bas_ID: 'BAS002', Bas_Content: 'سلة فواكه الموسم', Bas_Price: 75, Bas_Qty: 5, Far_ID: 'FAR-001', crops: [{ Cro_Name: 'تفاح', Cro_Qty: 10 }] },
+        ],
+        donations: [
+            { Don_ID: 'DON001', Don_Date: '2025-09-01', Don_Status: 'مقبول', crops: [{ Cro_Name: 'طماطم', DC_Quantity: 50 }], Req_ID: 'REQ001' },
+            { Don_ID: 'DON002', Don_Date: '2025-09-15', Don_Status: 'قيد المراجعة', crops: [{ Cro_Name: 'خيار', DC_Quantity: 20 }], Req_ID: 'REQ002' },
+        ],
+        notifications: [
+            { id: 1, message: "تم قبول طلب التبرع رقم DON001.", read: false },
+            { id: 2, message: "تم بيع 3 سلات من BAS001.", read: false },
+            { id: 3, message: "تذكير: تحديث رصيد محصول الطماطم.", read: true },
+        ]
+    };
+
+    window.notifications = window.farmerState.notifications;
+</script>
+
+<!-- الشريط الجانبي (Sidebar) -->
+<nav id="sidebarMenu" class="sidebar navbar-light d-lg-block">
+    <div class="position-sticky pt-3">
+        <div class="px-3 pb-3 mb-4">
+            <div class="d-flex align-items-center">
+                <i data-lucide="leaf" class="text-fresh-green ms-2" style="width: 30px; height: 30px;"></i>
+                <h5 class="fw-bold mb-0 text-earth-dark">قائمة لوحة التحكم</h5>
+            </div>
+        </div>
+
+        <ul class="nav flex-column px-3">
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#" onclick="showSection('account')">
+                    <i data-lucide="user" class="ms-2" style="width: 20px; height: 20px;"></i>
+                    حسابي وتحديث الملف
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="showSection('crops')">
+                    <i data-lucide="carrot" class="ms-2" style="width: 20px; height: 20px;"></i>
+                    إدارة المحاصيل
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="showSection('baskets')">
+                    <i data-lucide="shopping-basket" class="ms-2" style="width: 20px; height: 20px;"></i>
+                    السلال للبيع
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="showSection('donations')">
+                    <i data-lucide="heart" class="ms-2" style="width: 20px; height: 20px;"></i>
+                    طلبات التبرع
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="showSection('history')">
+                    <i data-lucide="list-ordered" class="ms-2" style="width: 20px; height: 20px;"></i>
+                    سجل العمليات
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="showSection('reports')">
+                    <i data-lucide="bar-chart-3" class="ms-2" style="width: 20px; height: 20px;"></i>
+                    تقرير التبرعات
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="#" onclick="showSection('reports')">
+                    <i data-lucide="log-out" class="ms-2" style="width: 20px; height: 20px;"></i>
+                    تسجيل الخروج
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!-- المحتوى الرئيسي -->
+<main class="main-content" id="mainContent">
+    <!-- شريط الترحيب والإشعار لنظام المزارع -->
+    <div class="row mb-4 align-items-center">
+        <div class="col-12 col-lg-8">
+            <h1 class="h2 fw-bold mb-0 text-earth-dark">مرحباً بك، <span id="farmerName"></span>!</h1>
+            <p class="text-muted mb-0">
+                <i data-lucide="shield" class="ms-1" style="width: 16px; height: 16px;"></i>
+                نوع المستخدم: <span class="fw-semibold" id="userType"></span> | ID: <span class="small" id="displayUserId"></span>
+            </p>
+        </div>
+        <div class="col-12 col-lg-4 text-lg-start mt-3 mt-lg-0">
+            <div class="d-flex justify-content-lg-start justify-content-center">
+                <button class="btn btn-sm btn-outline-fresh-green" data-bs-toggle="modal" data-bs-target="#notificationModal">
+                    <i data-lucide="bell-ring" class="ms-2" style="width: 18px; height: 18px;"></i>
+                    الإشعارات الجديدة (<span id="unreadCount">0</span>)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="h4 fw-bold mb-4" id="sectionTitle"></h3>
+
+    <!-- قسم 1: حسابي وتحديث الملف (Account) -->
+    <section id="account" class="dashboard-section">
+        <div class="dashboard-box">
+            <h4 class="h5 fw-bold text-fresh-green mb-4">تحديث معلومات الحساب</h4>
+            <form id="updateAccountForm">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="acc_firstName" class="form-label">الاسم الأول</label>
+                        <input type="text" class="form-control" id="acc_firstName" value="علي" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="acc_lastName" class="form-label">اسم العائلة</label>
+                        <input type="text" class="form-control" id="acc_lastName" value="الخضراوي" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="acc_phone" class="form-label">رقم الهاتف</label>
+                        <input type="tel" class="form-control" id="acc_phone" value="0501234567" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="acc_location" class="form-label">موقع المزرعة</label>
+                        <input type="text" class="form-control" id="acc_location" value="الرياض، المنطقة الزراعية أ" required>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-fresh-green">حفظ التحديثات</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- قسم 2: إدارة المحاصيل (Crops) -->
+    <section id="crops" class="dashboard-section" style="display: none;">
+        <div class="dashboard-box">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="h5 fw-bold text-fresh-green mb-0">المحاصيل المتاحة في مزرعتي</h4>
+                <button class="btn btn-sm btn-fresh-green" data-bs-toggle="modal" data-bs-target="#cropModal">
+                    <i data-lucide="plus" class="ms-2" style="width: 16px; height: 16px;"></i>
+                    إضافة محصول جديد
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>الاسم</th>
+                        <th>النوع</th>
+                        <th>الكمية المتاحة (كغ/وحدة)</th>
+                        <th>مدة الصلاحية</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                    </thead>
+                    <tbody id="cropsTableBody">
+                    <!-- Data will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم 3: السلال للبيع (Baskets) -->
+    <section id="baskets" class="dashboard-section" style="display: none;">
+        <div class="dashboard-box">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="h5 fw-bold text-fresh-green mb-0">سلال المحاصيل المعروضة للبيع</h4>
+                <button class="btn btn-sm btn-fresh-green" data-bs-toggle="modal" data-bs-target="#basketModal">
+                    <i data-lucide="plus" class="ms-2" style="width: 16px; height: 16px;"></i>
+                    إنشاء سلة جديدة للبيع
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>المحتوى</th>
+                        <th>السعر</th>
+                        <th>الكمية المتوفرة</th>
+                        <th>المحتويات المفصلة</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                    </thead>
+                    <tbody id="basketsTableBody">
+                    <!-- Data will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم 4: طلبات التبرع (Donations) -->
+    <section id="donations" class="dashboard-section" style="display: none;">
+        <div class="dashboard-box">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="h5 fw-bold text-fresh-green mb-0">سجل طلبات التبرع</h4>
+                <button class="btn btn-sm btn-fresh-green" data-bs-toggle="modal" data-bs-target="#donationRequestModal">
+                    <i data-lucide="plus" class="ms-2" style="width: 16px; height: 16px;"></i>
+                    إنشاء طلب تبرع جديد
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>تاريخ الطلب</th>
+                        <th>المحاصيل المتبرع بها</th>
+                        <th>الحالة</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                    </thead>
+                    <tbody id="donationsTableBody">
+                    <!-- Data will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم 5: سجل التبرعات والمبيعات (History) -->
+    <section id="history" class="dashboard-section" style="display: none;">
+        <div class="dashboard-box">
+            <h4 class="h5 fw-bold text-fresh-green mb-4">سجل عمليات التبرع والمبيعات</h4>
+            <p class="text-muted">هذا القسم يعرض سجلاً موحداً لجميع الأوامر (مبيعات السلال) والتبرعات.</p>
+            <!-- Mock list for history -->
+            <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    تبرع رقم DON001 (طماطم 50 كغ) - الحالة: <span class="badge text-bg-success">تم القبول</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    طلب سلة BAS001 (5 وحدات) - الحالة: <span class="badge text-bg-info">تم الشحن</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    تبرع رقم DON002 (خيار 20 كغ) - الحالة: <span class="badge text-bg-warning">قيد المراجعة</span>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- قسم 6: تقرير التبرعات (Reports) -->
+    <section id="reports" class="dashboard-section" style="display: none;">
+        <div class="dashboard-box">
+            <h4 class="h5 fw-bold text-fresh-green mb-4">توليد تقرير التبرعات</h4>
+            <p class="text-muted">اختر الفترة الزمنية لتوليد تقرير مفصل حول المحاصيل التي تبرعت بها.</p>
+            <form>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-5">
+                        <label for="startDate" class="form-label">من تاريخ</label>
+                        <input type="date" class="form-control" id="startDate">
+                    </div>
+                    <div class="col-md-5">
+                        <label for="endDate" class="form-label">إلى تاريخ</label>
+                        <input type="date" class="form-control" id="endDate">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-fresh-green w-100">توليد التقرير</button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="mt-4 p-4 border rounded bg-light text-center">
+                <p class="mb-0 text-muted">سيتم عرض التقرير الذي تم توليده هنا.</p>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!-- *********************************************************************************** -->
+<!-- MODALS -->
+<!-- *********************************************************************************** -->
+
+<!-- Modal 1: إضافة/تعديل المحصول (Crop Modal) -->
+<div class="modal fade" id="cropModal" tabindex="-1" aria-labelledby="cropModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cropModalLabel">إضافة/تعديل المحصول</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="cropForm">
+                <div class="modal-body">
+                    <input type="hidden" id="cropId">
+                    <div class="mb-3">
+                        <label for="cro_name" class="form-label">اسم المحصول</label>
+                        <input type="text" class="form-control" id="cro_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cro_type" class="form-label">نوع المحصول</label>
+                        <input type="text" class="form-control" id="cro_type" required placeholder="مثل: خضار، فاكهة، بقوليات">
+                    </div>
+                    <div class="mb-3">
+                        <label for="cro_qty" class="form-label">الكمية المتاحة (كغ أو وحدة)</label>
+                        <input type="number" class="form-control" id="cro_qty" required min="1">
+                    </div>
+                    <div class="mb-3">
+                        <label for="cro_shelf_life" class="form-label">مدة الصلاحية</label>
+                        <input type="text" class="form-control" id="cro_shelf_life" required placeholder="مثل: 7 أيام، 3 أسابيع">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-fresh-green">حفظ المحصول</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 2: إنشاء/تعديل السلة (Basket Modal) -->
+<div class="modal fade" id="basketModal" tabindex="-1" aria-labelledby="basketModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="basketModalLabel">إنشاء سلة جديدة للبيع</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="basketForm">
+                <div class="modal-body">
+                    <input type="hidden" id="basketId">
+                    <div class="mb-3">
+                        <label for="bas_content" class="form-label">اسم السلة/وصف المحتوى</label>
+                        <input type="text" class="form-control" id="bas_content" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="bas_price" class="form-label">سعر السلة (بالريال)</label>
+                            <input type="number" class="form-control" id="bas_price" required min="0.01" step="0.01">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="bas_qty" class="form-label">عدد السلال المتاح للبيع</label>
+                            <input type="number" class="form-control" id="bas_qty" required min="1">
+                        </div>
+                    </div>
+
+                    <h6 class="mt-3 mb-2 fw-semibold">محتويات السلة:</h6>
+                    <div id="basketCropsSelection" class="p-3 border rounded bg-light">
+                        <!-- Crop selection inputs will be generated here -->
+                    </div>
+                    <div class="alert alert-warning mt-3 small">
+                        ملاحظة: تأكد أن إجمالي الكميات المضافة للسلة لا يتجاوز الكميات المتاحة لديك.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-fresh-green">حفظ السلة للبيع</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 3: طلب تبرع جديد (Donation Request Modal) -->
+<div class="modal fade" id="donationRequestModal" tabindex="-1" aria-labelledby="donationRequestModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="donationRequestModalLabel">إنشاء طلب تبرع جديد</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="donationRequestForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="charitySelect" class="form-label">اختر الجمعية الخيرية المستهدفة</label>
+                        <select class="form-select" id="charitySelect" required>
+                            <option value="" disabled selected>اختر جمعية...</option>
+                            <option value="CH001">جمعية البر الخيرية (الرياض)</option>
+                            <option value="CH002">بنك الطعام السعودي (جدة)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="pickupDuration" class="form-label">مدة الاستعداد للاستلام (بالأيام)</label>
+                        <input type="number" class="form-control" id="pickupDuration" required min="1" placeholder="مثال: 3 أيام">
+                    </div>
+
+                    <h6 class="mt-4 mb-2 fw-semibold">محاصيل التبرع:</h6>
+                    <div id="donationCropsSelection" class="p-3 border rounded bg-light">
+                        <!-- Crop selection for donation will be generated here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-fresh-green">إرسال طلب التبرع</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 4: قائمة الإشعارات (Notification Modal) -->
+<div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-fresh-green text-white">
+                <h5 class="modal-title" id="notificationModalLabel">إشعارات النظام</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group" id="notificationList">
+                    <!-- Notifications loaded via JS -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="markAllAsRead()">تأشير الكل كمقروء</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1080; margin-top: 70px;">
+    <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <i data-lucide="bell" class="text-fresh-green ms-2" style="width: 20px; height: 20px;"></i>
+            <strong class="me-auto">إشعار النظام</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="toastBody">
+            <!-- Toast message content -->
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script type="module">
+    // --- Global State and DOM Elements ---
+    const { farmerDetails, crops, baskets, donations, notifications } = window.farmerState;
+
+    const cropsTableBody = document.getElementById('cropsTableBody');
+    const basketsTableBody = document.getElementById('basketsTableBody');
+    const donationsTableBody = document.getElementById('donationsTableBody');
+    const basketCropsSelection = document.getElementById('basketCropsSelection');
+    const donationCropsSelection = document.getElementById('donationCropsSelection');
+    const notificationList = document.getElementById('notificationList');
+    const unreadCountSpan = document.getElementById('unreadCount');
+    const notificationIconBadge = document.getElementById('notificationCount');
+    const sectionTitle = document.getElementById('sectionTitle');
+    const sidebar = document.getElementById('sidebarMenu');
+
+    // --- Utility Functions ---
+
+    /**
+     * Simulates showing a toast notification.
+     */
+    function showToast(message, isSuccess = true) {
+        const toastEl = document.getElementById('liveToast');
+        const toastBody = document.getElementById('toastBody');
+
+        // Reset background/text colors
+        toastEl.classList.remove('bg-success', 'bg-danger', 'text-white');
+
+        if (isSuccess) {
+            toastEl.classList.add('bg-success', 'text-white');
+        } else {
+            toastEl.classList.add('bg-danger', 'text-white');
+        }
+
+        toastBody.innerHTML = message;
+
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+    }
+
+    /**
+     * Toggles section visibility and updates the title.
+     */
+    function showSection(sectionId) {
+        document.querySelectorAll('.dashboard-section').forEach(section => {
+            section.style.display = 'none';
+        });
+        document.getElementById(sectionId).style.display = 'block';
+
+        // Update active link class
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        document.querySelector(`.nav-link[onclick*="${sectionId}"]`).classList.add('active');
+
+        // Update title
+        sectionTitle.textContent = document.querySelector(`.nav-link[onclick*="${sectionId}"]`).textContent.trim();
+
+        // Redraw icons if needed (Lucide)
+        lucide.createIcons();
+    }
+
+    /**
+     * Renders the Crops table based on current state.
+     */
+    function renderCropsTable() {
+        cropsTableBody.innerHTML = '';
+        crops.forEach((crop, index) => {
+            const row = cropsTableBody.insertRow();
+            row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${crop.Cro_Name}</td>
+                    <td>${crop.Cro_Type}</td>
+                    <td>${crop.Cro_Qty} كغ/وحدة</td>
+                    <td>${crop.Cro_ShelfLife}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-info ms-2" onclick="editCrop('${crop.Cro_ID}')">
+                            <i data-lucide="pencil" style="width: 16px; height: 16px;"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteCrop('${crop.Cro_ID}')">
+                            <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                        </button>
+                    </td>
+                `;
+        });
+        lucide.createIcons();
+    }
+
+    /**
+     * Renders the Baskets table based on current state.
+     */
+    function renderBasketsTable() {
+        basketsTableBody.innerHTML = '';
+        baskets.forEach((basket, index) => {
+            const cropContent = basket.crops.map(c => `${c.Cro_Name} (${c.Cro_Qty})`).join('، ');
+            const row = basketsTableBody.insertRow();
+            row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${basket.Bas_Content}</td>
+                    <td>${basket.Bas_Price.toFixed(2)} ر.س</td>
+                    <td>${basket.Bas_Qty} سلة</td>
+                    <td>${cropContent}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-info ms-2" onclick="editBasket('${basket.Bas_ID}')">
+                            <i data-lucide="pencil" style="width: 16px; height: 16px;"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteBasket('${basket.Bas_ID}')">
+                            <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                        </button>
+                    </td>
+                `;
+        });
+        lucide.createIcons();
+    }
+
+    /**
+     * Renders the Donations table based on current state.
+     */
+    function renderDonationsTable() {
+        donationsTableBody.innerHTML = '';
+        donations.forEach((donation, index) => {
+            const cropContent = donation.crops.map(c => `${c.Cro_Name} (${c.DC_Quantity} كغ)`).join('، ');
+            let statusClass = 'badge text-bg-secondary';
+            if (donation.Don_Status === 'مقبول') statusClass = 'badge text-bg-success';
+            else if (donation.Don_Status === 'قيد المراجعة') statusClass = 'badge text-bg-warning';
+
+            const row = donationsTableBody.insertRow();
+            row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${donation.Don_Date}</td>
+                    <td>${cropContent}</td>
+                    <td><span class="${statusClass}">${donation.Don_Status}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="viewDonation('${donation.Don_ID}')">
+                            <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+                        </button>
+                    </td>
+                `;
+        });
+        lucide.createIcons();
+    }
+
+    /**
+     * Generates the multi-crop selection form for Baskets or Donations.
+     */
+    function generateCropsSelection(container, isDonation = false) {
+        container.innerHTML = '';
+        const title = isDonation ? 'تبرع بـ:' : 'كمية المحصول في كل سلة:';
+
+        crops.forEach((crop) => {
+            const div = document.createElement('div');
+            div.className = 'input-group input-group-sm mb-2';
+            div.innerHTML = `
+                    <span class="input-group-text">${crop.Cro_Name} (${crop.Cro_Qty} متاح)</span>
+                    <input type="number" class="form-control"
+                           data-crop-id="${crop.Cro_ID}"
+                           data-crop-name="${crop.Cro_Name}"
+                           placeholder="الكمية"
+                           min="0" max="${crop.Cro_Qty}" value="0">
+                    <span class="input-group-text">${isDonation ? 'كغ' : 'وحدة'}</span>
+                `;
+            container.appendChild(div);
+        });
+    }
+
+    /**
+     * Renders the Notification Modal and updates the counts.
+     */
+    function renderNotifications() {
+        const unread = notifications.filter(n => !n.read);
+
+        unreadCountSpan.textContent = unread.length;
+        notificationIconBadge.textContent = unread.length;
+        notificationIconBadge.style.display = unread.length > 0 ? 'inline' : 'none';
+
+        notificationList.innerHTML = '';
+
+        if (notifications.length === 0) {
+            notificationList.innerHTML = '<li class="list-group-item text-center text-muted">لا توجد إشعارات حاليًا.</li>';
+            return;
+        }
+
+        notifications.sort((a, b) => a.read - b.read).forEach(n => {
+            const item = document.createElement('li');
+            item.className = `list-group-item ${n.read ? 'text-muted' : 'fw-bold bg-light'}`;
+            item.textContent = n.message;
+            item.onclick = () => { markAsRead(n.id); };
+            notificationList.appendChild(item);
+        });
+    }
+
+    window.markAsRead = function(id) {
+        const notification = notifications.find(n => n.id === id);
+        if (notification && !notification.read) {
+            notification.read = true;
+            renderNotifications();
+            showToast(`تم تأشير الإشعار كمقروء.`, true);
+        }
+    }
+
+    window.markAllAsRead = function() {
+        notifications.forEach(n => n.read = true);
+        renderNotifications();
+        showToast(`تم تأشير جميع الإشعارات كمقروءة.`, true);
+        // Close modal manually if open
+        const modal = bootstrap.Modal.getInstance(document.getElementById('notificationModal'));
+        if (modal) modal.hide();
+    }
+
+    // --- CRUD Operations (Mocking Firestore) ---
+
+    document.getElementById('cropForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const cropId = document.getElementById('cropId').value;
+        const newCrop = {
+            Cro_Name: document.getElementById('cro_name').value,
+            Cro_Type: document.getElementById('cro_type').value,
+            Cro_Qty: parseInt(document.getElementById('cro_qty').value),
+            Cro_ShelfLife: document.getElementById('cro_shelf_life').value,
+            Far_ID: farmerDetails.Far_ID
+        };
+
+        if (cropId) {
+            const index = crops.findIndex(c => c.Cro_ID === cropId);
+            if (index !== -1) {
+                crops[index] = { ...crops[index], ...newCrop };
+                showToast(`تم تحديث المحصول ${newCrop.Cro_Name} بنجاح.`);
+            }
+        } else {
+            newCrop.Cro_ID = 'CR' + Date.now();
+            crops.push(newCrop);
+            showToast(`تم إضافة المحصول ${newCrop.Cro_Name} بنجاح.`);
+        }
+
+        renderCropsTable();
+        bootstrap.Modal.getInstance(document.getElementById('cropModal')).hide();
+    });
+
+    window.editCrop = function(cropId) {
+        const crop = crops.find(c => c.Cro_ID === cropId);
+        if (crop) {
+            document.getElementById('cropId').value = crop.Cro_ID;
+            document.getElementById('cro_name').value = crop.Cro_Name;
+            document.getElementById('cro_type').value = crop.Cro_Type;
+            document.getElementById('cro_qty').value = crop.Cro_Qty;
+            document.getElementById('cro_shelf_life').value = crop.Cro_ShelfLife;
+            document.getElementById('cropModalLabel').textContent = `تعديل المحصول: ${crop.Cro_Name}`;
+            new bootstrap.Modal(document.getElementById('cropModal')).show();
+        }
+    };
+
+    window.deleteCrop = function(cropId) {
+        if (confirm('هل أنت متأكد من حذف هذا المحصول؟')) {
+            const index = crops.findIndex(c => c.Cro_ID === cropId);
+            if (index !== -1) {
+                const deletedName = crops[index].Cro_Name;
+                crops.splice(index, 1);
+                renderCropsTable();
+                showToast(`تم حذف المحصول ${deletedName} بنجاح.`, false);
+            }
+        }
+    };
+
+    document.getElementById('basketForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const basketCrops = [];
+        document.querySelectorAll('#basketCropsSelection input').forEach(input => {
+            const qty = parseInt(input.value) || 0;
+            if (qty > 0) {
+                basketCrops.push({
+                    Cro_ID: input.getAttribute('data-crop-id'),
+                    Cro_Name: input.getAttribute('data-crop-name'),
+                    Cro_Qty: qty // This is BC_Qty
+                });
+            }
+        });
+
+        if (basketCrops.length === 0) {
+            showToast('يجب أن تحتوي السلة على محصول واحد على الأقل.', false);
+            return;
+        }
+
+        const newBasket = {
+            Bas_Content: document.getElementById('bas_content').value,
+            Bas_Price: parseFloat(document.getElementById('bas_price').value),
+            Bas_Qty: parseInt(document.getElementById('bas_qty').value),
+            Far_ID: farmerDetails.Far_ID,
+            crops: basketCrops
+        };
+
+        const basketId = document.getElementById('basketId').value;
+        if (basketId) {
+            const index = baskets.findIndex(b => b.Bas_ID === basketId);
+            if (index !== -1) {
+                baskets[index] = { ...baskets[index], ...newBasket };
+                showToast(`تم تحديث السلة ${newBasket.Bas_Content} بنجاح.`);
+            }
+        } else {
+            newBasket.Bas_ID = 'BAS' + Date.now();
+            baskets.push(newBasket);
+            showToast(`تم إنشاء السلة ${newBasket.Bas_Content} وعرضها للبيع.`);
+        }
+
+        renderBasketsTable();
+        bootstrap.Modal.getInstance(document.getElementById('basketModal')).hide();
+    });
+
+    document.getElementById('basketModal').addEventListener('show.bs.modal', function(event) {
+        const modalTitle = document.getElementById('basketModalLabel');
+        const basketIdInput = document.getElementById('basketId');
+        const relatedButton = event.relatedTarget;
+
+        if (!relatedButton || !relatedButton.getAttribute('data-basket-id')) {
+            document.getElementById('basketForm').reset();
+            basketIdInput.value = '';
+            modalTitle.textContent = 'إنشاء سلة جديدة للبيع';
+        }
+        generateCropsSelection(basketCropsSelection, false);
+    });
+
+    document.getElementById('donationRequestForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const donationCrops = [];
+        document.querySelectorAll('#donationCropsSelection input').forEach(input => {
+            const qty = parseInt(input.value) || 0;
+            if (qty > 0) {
+                donationCrops.push({
+                    Cro_ID: input.getAttribute('data-crop-id'),
+                    Cro_Name: input.getAttribute('data-crop-name'),
+                    DC_Quantity: qty
+                });
+            }
+        });
+
+        if (donationCrops.length === 0) {
+            showToast('يجب تحديد كميات المحاصيل للتبرع.', false);
+            return;
+        }
+
+        const newDonation = {
+            Don_ID: 'DON' + Date.now(),
+            Don_Date: new Date().toISOString().split('T')[0],
+            Don_Status: 'قيد المراجعة',
+            Far_ID: farmerDetails.Far_ID,
+            crops: donationCrops,
+            Req_ID: 'REQ' + Date.now(),
+            Req_Status: 'جديد',
+            Char_ID: document.getElementById('charitySelect').value,
+            DonationRequest_PickupDuration: parseInt(document.getElementById('pickupDuration').value)
+        };
+
+        donations.push(newDonation);
+        renderDonationsTable();
+
+        showToast('تم إرسال طلب التبرع بنجاح للجمعية الخيرية المختارة.');
+
+        bootstrap.Modal.getInstance(document.getElementById('donationRequestModal')).hide();
+    });
+
+    document.getElementById('donationRequestModal').addEventListener('show.bs.modal', function(event) {
+        document.getElementById('donationRequestForm').reset();
+        generateCropsSelection(donationCropsSelection, true);
+    });
+
+
+    // --- Initialization ---
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Update Farmer Info (Account Management View)
+        document.getElementById('farmerName').textContent = `${farmerDetails.Far_FirstName} ${farmerDetails.Far_LastName}`;
+        document.getElementById('userType').textContent = farmerDetails.User_Type;
+        document.getElementById('displayUserId').textContent = window.userId;
+
+        // Initial rendering of tables and icons
+        renderCropsTable();
+        renderBasketsTable();
+        renderDonationsTable();
+        renderNotifications(); // Initial render for notifications
+        lucide.createIcons();
+
+        // Set initial active section
+        showSection('account');
+
+        // Initialize mobile sidebar collapse
+        new bootstrap.Collapse(sidebar, { toggle: false });
+
+        // Handle mobile menu toggle for sidebar (not strictly needed since sidebar is fixed
+        // but for future mobile development it's good to keep the structure)
+    });
+
+    // Expose function globally for the sidebar links
+    window.showSection = showSection;
+
+</script>
+</body>
+</html>

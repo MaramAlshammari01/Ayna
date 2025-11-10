@@ -1,0 +1,147 @@
+body {
+    font-family: "Amiri", "Noto Naskh Arabic", serif;
+}
+:root {
+    --bs-fresh-green: #38a169; /* Primary/Growth */
+    --bs-harvest-gold: #e8a21f; /* Secondary/Donation */
+    --bs-earth-brown: #5c3b1a; /* Accent/Soil */
+    --bs-earth-dark: #37291a; /* Footer Background */
+
+    /* تجاوز ألوان Bootstrap المخصصة */
+    --bs-primary: var(--bs-fresh-green);
+    --bs-primary-rgb: 56, 161, 105;
+    --bs-body-color: var(--bs-earth-brown);
+    --bs-border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* فئات مساعدة لمحاكاة ألوان Tailwind */
+.bg-fresh-green { background-color: var(--bs-fresh-green) !important; }
+.text-fresh-green { color: var(--bs-fresh-green) !important; }
+.btn-fresh-green {
+    /* تعديل الزر ليتطابق مع تدرج الألوان المطلوب */
+    background: linear-gradient(to right, var(--bs-fresh-green), var(--bs-harvest-gold));
+    color: #fff !important;
+    border-color: var(--bs-fresh-green) !important;
+}
+.btn-fresh-green:hover { opacity: 0.9; }
+.btn-outline-fresh-green {
+    color: var(--bs-fresh-green) !important;
+    border-color: var(--bs-fresh-green) !important;
+}
+.btn-outline-fresh-green:hover {
+    background-color: var(--bs-fresh-green) !important;
+    color: #fff !important;
+}
+
+.text-harvest-gold { color: var(--bs-harvest-gold) !important; }
+.text-earth-brown { color: var(--bs-earth-brown) !important; }
+.bg-earth-dark { background-color: var(--bs-earth-dark) !important; }
+
+/* الظلال المخصصة للبطاقات وتأثيرات التحويم */
+.shadow-soft { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06); }
+.card-hover:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* تأثيرات تدرج النص */
+.text-gradient-earth {
+    background: linear-gradient(to right, var(--bs-fresh-green), var(--bs-harvest-gold), var(--bs-earth-brown));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.text-gradient-hero {
+    background: linear-gradient(to right, var(--bs-fresh-green), var(--bs-harvest-gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* خلفية البطل مع طبقة التعتيم (تم تغيير الصورة Placeholder إلى واحدة أكثر ملاءمة للشرق الأوسط) */
+.hero-bg-placeholder {
+    /* Placeholder image representing a fresh field */
+    background-image: url('hero-image.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 80vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 0;
+    /* محاكاة تعتيم الخلفية عبر لون الخلفية والشفافية */
+    background: rgba(255, 255, 255, 0.62);
+}
+.stats123 {
+    background: #ffffff78;
+    border-radius: 23px;
+    margin: auto;
+}
+
+/* الأنماط المخصصة لفئات المرافق (مع تعديل هامش البداية/النهاية عند الضرورة في RTL) */
+.space-y-2 > * + * { margin-top: 0.5rem; }
+.space-y-3 > * + * { margin-top: 0.75rem; }
+
+.icon-bg-fresh-green { background-color: rgba(var(--bs-primary-rgb), 0.1); }
+.icon-bg-harvest-gold { background-color: rgba(232, 162, 31, 0.1); }
+.icon-bg-earth-brown { background-color: rgba(92, 59, 26, 0.1); }
+
+.active-nav {
+    background: #ffe998;
+    padding: 0 12px;
+    color: var(--bs-earth-dark) !important;
+    border-radius: 5px;
+    margin-inline-end: 10px; /* استخدام margin-inline-end لـ RTL */
+}
+
+/* تعديلات RTL محددة */
+.ms-2-rtl { margin-right: 0.5rem !important; }
+.me-2-rtl { margin-left: 0.5rem !important; }
+.btn-green {
+    background-color: #4CAF50;
+    border-color: #4CAF50;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+.btn-green:hover {
+    background-color: #388E3C;
+    border-color: #388E3C;
+}
+.auth-card {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: none; /* Shadow removed as it's in a modal */
+    max-width: 550px;
+    width: 100%;
+}
+
+.form-control-icon {
+    padding-right: 2.25rem !important; /* Adjust padding for icon on the right in RTL */
+    padding-left: 0.75rem !important;
+}
+.form-icon-rtl {
+    position: absolute;
+    top: 50%;
+    right: 0.75rem; /* Position icon on the right */
+    transform: translateY(-50%);
+    color: #6c757d; /* muted-foreground */
+    pointer-events: none;
+    width: 1rem;
+    height: 1rem;
+}
+/* Toast styles (minimal simulation) */
+.toast-container {
+    position: fixed;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1080;
+}

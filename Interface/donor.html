@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم المتبرع - عون المزرعة إلى المائدة</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bs-primary: #38a169;
+            --bs-secondary: #e8a21f;
+            --bs-accent: #5c3b1a;
+            --bs-dark: #37291a;
+            --bs-light: #f8fafc;
+        }
+
+        body {
+            font-family: "Amiri", "Noto Naskh Arabic", serif;
+            background-color: #f8fafc;
+            color: #333;
+        }
+
+        .navbar-brand img {
+            height: 55px;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fff9 100%);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+            position: fixed;
+            top: 80px;
+            right: 0;
+            height: calc(100% - 80px);
+            z-index: 999;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .main-content {
+            margin-right: 280px;
+            padding: 25px;
+            transition: margin-right 0.3s ease;
+            background-color: #f8fafc;
+        }
+
+        .main-content.expanded {
+            margin-right: 0;
+        }
+
+        .nav-link.active {
+            background: linear-gradient(90deg, rgba(56, 161, 105, 0.1) 0%, rgba(56, 161, 105, 0.05) 100%);
+            color: var(--bs-primary) !important;
+            border-right: 4px solid var(--bs-primary);
+            font-weight: 600;
+        }
+
+        .nav-link {
+            border-radius: 0.75rem;
+            margin-bottom: 0.5rem;
+            color: var(--bs-accent);
+            padding: 0.85rem 1rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(56, 161, 105, 0.05);
+            transform: translateX(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--bs-primary) 0%, #2f855a 100%);
+            border-color: var(--bs-primary);
+            color: #fff;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2f855a 0%, #276749 100%);
+            border-color: #2f855a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(56, 161, 105, 0.3);
+        }
+
+        .dashboard-box {
+            background: #ffffff;
+            border-radius: 1.25rem;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            margin-bottom: 2rem;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .dashboard-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fff9 100%);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(56, 161, 105, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(56, 161, 105, 0.15);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--bs-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--bs-accent);
+            font-weight: 500;
+        }
+
+        .chart-container {
+            background: #ffffff;
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            margin-bottom: 2rem;
+        }
+
+        .table-responsive {
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .table th {
+            background-color: rgba(56, 161, 105, 0.05);
+            color: var(--bs-accent);
+            font-weight: 600;
+            border-bottom: 2px solid rgba(56, 161, 105, 0.1);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(56, 161, 105, 0.03);
+        }
+
+        .badge-success {
+            background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+        }
+
+        .badge-warning {
+            background: linear-gradient(135deg, #e8a21f 0%, #d69e2e 100%);
+        }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, rgba(56, 161, 105, 0.1) 0%, rgba(232, 162, 31, 0.1) 100%);
+            border-radius: 1.25rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(56, 161, 105, 0.1);
+        }
+
+        .basket-card {
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .basket-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .cart-item {
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: #f8fafc;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .filter-section {
+            background: #ffffff;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(280px);
+            }
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- شريط التنقل العام -->
+<nav class="navbar navbar-expand-md navbar-light sticky-top shadow-sm" style="--bs-bg-opacity: .95; backdrop-filter: blur(5px); padding: 0;background: linear-gradient(135deg, #e5fff4 0%, #f0fff8 100%) !important;">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <img src="logo.png" height="75">
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="تبديل التنقل">
+            <i data-lucide="menu"></i>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto mb-2 mb-md-0 d-none d-md-flex">
+            </ul>
+
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm position-relative" data-bs-toggle="modal" data-bs-target="#notificationModal">
+                    <i data-lucide="bell" style="width: 20px; height: 20px;"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notificationCount">3</span>
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm position-relative" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
+                    <i data-lucide="shopping-cart" style="width: 20px; height: 20px;"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary" id="cartCount">2</span>
+                </button>
+                <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-mode="signUp"> تسجيل الخروج </button>
+            </div>
+
+            <div class="d-block d-md-none border-top mt-3 pt-3">
+                <div class="d-flex align-items-center gap-2 mt-2">
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-mode="signUp">ابدأ الآن</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- الشريط الجانبي -->
+<nav id="sidebarMenu" class="sidebar navbar-light d-lg-block">
+    <div class="position-sticky pt-3">
+        <div class="px-3 pb-3 mb-4">
+            <div class="d-flex align-items-center">
+                <i data-lucide="heart" class="text-primary ms-2" style="width: 30px; height: 30px;"></i>
+                <h5 class="fw-bold mb-0 text-dark">قائمة لوحة التحكم</h5>
+            </div>
+        </div>
+
+        <ul class="nav flex-column px-3">
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="showSection('dashboard')">
+                    <i data-lucide="home" class="ms-2" style="width: 20px; height: 20px;"></i>
+                    الرئيسية
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="showSection('account')">
+                    <i data-lucide="user" class="ms-2" style="width: 20px; height: 20px;"></i>
+                    حسابي وتحديث الملف
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="showSection('browse')">
+                    <i data-lucide="search" class="ms-2" style="width: 20px; height: 20px;"></i>
+                    تصفح السلال
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="showSection('payment')">
+                    <i data-lucide="credit-card" class="ms-2" style="width: 20px; height: 20px;"></i>
+                    طرق الدفع
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="showSection('donations')">
+                    <i data-lucide="heart-handshake" class="ms-2" style="width: 20px; height: 20px;"></i>
+                    التبرعات
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="showSection('history')">
+                    <i data-lucide="history" class="ms-2" style="width: 20px; height: 20px;"></i>
+                    سجل العمليات
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="showSection('reports')">
+                    <i data-lucide="bar-chart-3" class="ms-2" style="width: 20px; height: 20px;"></i>
+                    تقارير التبرعات
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="#">
+                    <i data-lucide="log-out" class="ms-2" style="width: 20px; height: 20px;"></i>
+                    تسجيل الخروج
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!-- المحتوى الرئيسي -->
+<main class="main-content" id="mainContent">
+    <!-- شريط الترحيب -->
+    <div class="welcome-banner">
+        <div class="row align-items-center">
+            <div class="col-12 col-lg-8">
+                <h1 class="h2 fw-bold mb-2 text-dark">مرحباً بك، <span id="donorName">أحمد العلي</span>!</h1>
+                <p class="text-muted mb-0">
+                    <i data-lucide="shield" class="ms-1" style="width: 16px; height: 16px;"></i>
+                    نوع المستخدم: <span class="fw-semibold" id="userType">متبرع</span> | ID: <span class="small" id="displayUserId">DON-001</span>
+                </p>
+            </div>
+            <div class="col-12 col-lg-4 text-lg-start mt-3 mt-lg-0">
+                <div class="d-flex justify-content-lg-start justify-content-center">
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#notificationModal">
+                        <i data-lucide="bell-ring" class="ms-2" style="width: 18px; height: 18px;"></i>
+                        الإشعارات الجديدة (<span id="unreadCount">3</span>)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="h4 fw-bold mb-4" id="sectionTitle"></h3>
+
+    <!-- قسم الرئيسية (Dashboard) -->
+    <section id="dashboard" class="dashboard-section">
+        <!-- إحصائيات سريعة -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalDonations">5</div>
+                    <div class="stat-label">إجمالي التبرعات</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalBaskets">12</div>
+                    <div class="stat-label">السلال المشتراة</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalAmount">1,250</div>
+                    <div class="stat-label">إجمالي المبلغ (ر.س)</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div class="stat-number" id="activeDonations">2</div>
+                    <div class="stat-label">تبرعات نشطة</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- المخططات -->
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="chart-container">
+                    <h5 class="fw-bold text-dark mb-3">التبرعات خلال السنة</h5>
+                    <canvas id="donationsChart" height="250"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="chart-container">
+                    <h5 class="fw-bold text-dark mb-3">توزيع التبرعات</h5>
+                    <canvas id="distributionChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- نشاط حديث -->
+        <div class="dashboard-box">
+            <h4 class="h5 fw-bold text-primary mb-4">النشاط الحديث</h4>
+            <div class="list-group">
+                <div class="list-group-item d-flex justify-content-between align-items-center border-0 py-3">
+                    <div class="d-flex align-items-center">
+                        <i data-lucide="shopping-basket" class="text-primary ms-3" style="width: 20px; height: 20px;"></i>
+                        <span>تم تأكيد تبرعك لسلة الخضروات اليومية</span>
+                    </div>
+                    <small class="text-muted">منذ ساعتين</small>
+                </div>
+                <div class="list-group-item d-flex justify-content-between align-items-center border-0 py-3">
+                    <div class="d-flex align-items-center">
+                        <i data-lucide="truck" class="text-primary ms-3" style="width: 20px; height: 20px;"></i>
+                        <span>تم شحن تبرعك إلى جمعية البر الخيرية</span>
+                    </div>
+                    <small class="text-muted">منذ يوم</small>
+                </div>
+                <div class="list-group-item d-flex justify-content-between align-items-center border-0 py-3">
+                    <div class="d-flex align-items-center">
+                        <i data-lucide="credit-card" class="text-primary ms-3" style="width: 20px; height: 20px;"></i>
+                        <span>تمت إضافة طريقة دفع جديدة</span>
+                    </div>
+                    <small class="text-muted">منذ 3 أيام</small>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم 1: حسابي وتحديث الملف (Account) -->
+    <section id="account" class="dashboard-section" style="display: none;">
+        <div class="dashboard-box">
+            <h4 class="h5 fw-bold text-primary mb-4">تحديث معلومات الحساب</h4>
+            <form id="updateAccountForm">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="acc_firstName" class="form-label">الاسم الأول</label>
+                        <input type="text" class="form-control" id="acc_firstName" value="أحمد" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="acc_lastName" class="form-label">اسم العائلة</label>
+                        <input type="text" class="form-control" id="acc_lastName" value="العلي" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="acc_email" class="form-label">البريد الإلكتروني</label>
+                        <input type="email" class="form-control" id="acc_email" value="ahmed@example.com" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="acc_phone" class="form-label">رقم الهاتف</label>
+                        <input type="tel" class="form-control" id="acc_phone" value="0501234567" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="acc_gender" class="form-label">الجنس</label>
+                        <select class="form-select" id="acc_gender" required>
+                            <option value="ذكر" selected>ذكر</option>
+                            <option value="أنثى">أنثى</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">حفظ التحديثات</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- قسم 2: تصفح السلال (Browse) -->
+    <section id="browse" class="dashboard-section" style="display: none;">
+        <!-- فلترة السلال -->
+        <div class="filter-section">
+            <h5 class="fw-bold text-primary mb-3">فلترة السلال</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="searchBasket" class="form-label">بحث</label>
+                    <input type="text" class="form-control" id="searchBasket" placeholder="ابحث عن سلة...">
+                </div>
+                <div class="col-md-3">
+                    <label for="filterType" class="form-label">نوع المحصول</label>
+                    <select class="form-select" id="filterType">
+                        <option value="">الكل</option>
+                        <option value="خضار">خضار</option>
+                        <option value="فاكهة">فاكهة</option>
+                        <option value="بقوليات">بقوليات</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="filterPrice" class="form-label">السعر</label>
+                    <select class="form-select" id="filterPrice">
+                        <option value="">الكل</option>
+                        <option value="0-50">0 - 50 ر.س</option>
+                        <option value="50-100">50 - 100 ر.س</option>
+                        <option value="100+">أكثر من 100 ر.س</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button class="btn btn-primary w-100" onclick="filterBaskets()">تطبيق</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- عرض السلال -->
+        <div class="row" id="basketsContainer">
+            <!-- سيتم إضافة السلال ديناميكياً -->
+        </div>
+    </section>
+
+    <!-- قسم 3: طرق الدفع (Payment) -->
+    <section id="payment" class="dashboard-section" style="display: none;">
+        <div class="dashboard-box">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="h5 fw-bold text-primary mb-0">طرق الدفع الخاصة بي</h4>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#paymentModal">
+                    <i data-lucide="plus" class="ms-2" style="width: 16px; height: 16px;"></i>
+                    إضافة طريقة دفع
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>نوع الدفع</th>
+                        <th>رقم البطاقة/الحساب</th>
+                        <th>تاريخ الإضافة</th>
+                        <th>الحالة</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                    </thead>
+                    <tbody id="paymentTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم 4: التبرعات (Donations) -->
+    <section id="donations" class="dashboard-section" style="display: none;">
+        <div class="dashboard-box">
+            <h4 class="h5 fw-bold text-primary mb-4">تبرعاتي</h4>
+
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>رقم التبرع</th>
+                        <th>السلة المتبرع بها</th>
+                        <th>الجمعية المستفيدة</th>
+                        <th>المبلغ</th>
+                        <th>الحالة</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                    </thead>
+                    <tbody id="donationsTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم 5: سجل العمليات (History) -->
+    <section id="history" class="dashboard-section" style="display: none;">
+        <div class="dashboard-box">
+            <h4 class="h5 fw-bold text-primary mb-4">سجل عمليات التبرع والمشتريات</h4>
+
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>التاريخ</th>
+                        <th>النوع</th>
+                        <th>التفاصيل</th>
+                        <th>المبلغ</th>
+                        <th>الحالة</th>
+                    </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم 6: تقارير التبرعات (Reports) -->
+    <section id="reports" class="dashboard-section" style="display: none;">
+        <div class="dashboard-box">
+            <h4 class="h5 fw-bold text-primary mb-4">توليد تقرير التبرعات</h4>
+            <p class="text-muted">اختر الفترة الزمنية لتوليد تقرير مفصل حول تبرعاتك.</p>
+            <form id="reportForm">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-5">
+                        <label for="startDate" class="form-label">من تاريخ</label>
+                        <input type="date" class="form-control" id="startDate">
+                    </div>
+                    <div class="col-md-5">
+                        <label for="endDate" class="form-label">إلى تاريخ</label>
+                        <input type="date" class="form-control" id="endDate">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">توليد التقرير</button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="mt-4 p-4 border rounded bg-light text-center" id="reportResult">
+                <p class="mb-0 text-muted">سيتم عرض التقرير الذي تم توليده هنا.</p>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!-- *********************************************************************************** -->
+<!-- MODALS -->
+<!-- *********************************************************************************** -->
+
+<!-- Modal 1: إضافة طريقة دفع -->
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="paymentModalLabel">إضافة طريقة دفع جديدة</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="paymentForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="pay_method" class="form-label">نوع الدفع</label>
+                        <select class="form-select" id="pay_method" required>
+                            <option value="" disabled selected>اختر طريقة الدفع...</option>
+                            <option value="بطاقة ائتمان">بطاقة ائتمان</option>
+                            <option value="بطاقة مدى">بطاقة مدى</option>
+                            <option value="حساب بنكي">حساب بنكي</option>
+                            <option value="محفظة إلكترونية">محفظة إلكترونية</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="pay_details" class="form-label">رقم البطاقة/الحساب</label>
+                        <input type="text" class="form-control" id="pay_details" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="pay_expiry" class="form-label">تاريخ الانتهاء (إن وجد)</label>
+                        <input type="text" class="form-control" id="pay_expiry" placeholder="MM/YY">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">حفظ طريقة الدفع</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 2: تأكيد التبرع -->
+<div class="modal fade" id="donationModal" tabindex="-1" aria-labelledby="donationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="donationModalLabel">تأكيد التبرع</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="donationForm">
+                <div class="modal-body">
+                    <input type="hidden" id="selectedBasketId">
+                    <div class="mb-3">
+                        <p>أنت على وشك التبرع بـ: <strong id="selectedBasketName"></strong></p>
+                        <p>السعر: <strong id="selectedBasketPrice"></strong> ر.س</p>
+                    </div>
+                    <div class="mb-3">
+                        <label for="donationCharity" class="form-label">اختر الجمعية المستفيدة</label>
+                        <select class="form-select" id="donationCharity" required>
+                            <option value="" disabled selected>اختر جمعية...</option>
+                            <option value="CH001">جمعية البر الخيرية (الرياض)</option>
+                            <option value="CH002">بنك الطعام السعودي (جدة)</option>
+                            <option value="CH003">جمعية إطعام (الشرقية)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="donationPayment" class="form-label">طريقة الدفع</label>
+                        <select class="form-select" id="donationPayment" required>
+                            <option value="" disabled selected>اختر طريقة الدفع...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">تأكيد التبرع</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 3: قائمة الإشعارات -->
+<div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="notificationModalLabel">إشعارات النظام</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group" id="notificationList">
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="markAllAsRead()">تأشير الكل كمقروء</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Offcanvas للسلة -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="cartOffcanvas" aria-labelledby="cartOffcanvasLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="cartOffcanvasLabel">سلة التسوق</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div id="cartItemsContainer">
+            <!-- سيتم إضافة عناصر السلة ديناميكياً -->
+        </div>
+        <div class="mt-3 pt-3 border-top">
+            <div class="d-flex justify-content-between mb-2">
+                <span>الإجمالي:</span>
+                <strong id="cartTotal">0 ر.س</strong>
+            </div>
+            <button class="btn btn-primary w-100" onclick="proceedToDonation()">المتابعة للتبرع</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1080; margin-top: 70px;">
+    <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <i data-lucide="bell" class="text-primary ms-2" style="width: 20px; height: 20px;"></i>
+            <strong class="me-auto">إشعار النظام</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="toastBody">
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // --- Global State ---
+    const donorState = {
+        donorDetails: {
+            Donor_ID: "DON-001",
+            Donor_FirstName: "أحمد",
+            Donor_LastName: "العلي",
+            Donor_Gender: "ذكر",
+            User_ID: "USER-001"
+        },
+        payments: [
+            { Pay_ID: 'PAY001', Pay_Method: 'بطاقة ائتمان', Pay_Details: '**** **** **** 1234', Pay_Date: '2025-08-01', Pay_Status: 'نشط' },
+            { Pay_ID: 'PAY002', Pay_Method: 'بطاقة مدى', Pay_Details: '**** **** **** 5678', Pay_Date: '2025-07-15', Pay_Status: 'نشط' },
+        ],
+        baskets: [
+            { Bas_ID: 'BAS001', Bas_Content: 'سلة الخضروات اليومية', Bas_Price: 50, Bas_Qty: 10, crops: [{ Cro_Name: 'طماطم', Cro_Qty: 5 }, { Cro_Name: 'خيار', Cro_Qty: 3 }] },
+            { Bas_ID: 'BAS002', Bas_Content: 'سلة فواكه الموسم', Bas_Price: 75, Bas_Qty: 5, crops: [{ Cro_Name: 'تفاح', Cro_Qty: 10 }] },
+            { Bas_ID: 'BAS003', Bas_Content: 'سلة الخضروات المتنوعة', Bas_Price: 60, Bas_Qty: 8, crops: [{ Cro_Name: 'جزر', Cro_Qty: 3 }, { Cro_Name: 'بطاطس', Cro_Qty: 5 }] },
+            { Bas_ID: 'BAS004', Bas_Content: 'سلة الفواكه الاستوائية', Bas_Price: 90, Bas_Qty: 3, crops: [{ Cro_Name: 'مانجو', Cro_Qty: 2 }, { Cro_Name: 'أناناس', Cro_Qty: 1 }] },
+        ],
+        donations: [
+            { Don_ID: 'DON001', Don_Date: '2025-09-01', Don_Status: 'مكتمل', Basket: 'سلة الخضروات اليومية', Charity: 'جمعية البر الخيرية', Amount: 50 },
+            { Don_ID: 'DON002', Don_Date: '2025-09-05', Don_Status: 'قيد التجهيز', Basket: 'سلة فواكه الموسم', Charity: 'بنك الطعام السعودي', Amount: 75 },
+            { Don_ID: 'DON003', Don_Date: '2025-08-20', Don_Status: 'مكتمل', Basket: 'سلة الخضروات المتنوعة', Charity: 'جمعية إطعام', Amount: 60 },
+        ],
+        history: [
+            { id: 1, Date: '2025-09-01', Type: 'تبرع', Details: 'سلة الخضروات اليومية', Amount: 50, Status: 'مكتمل' },
+            { id: 2, Date: '2025-09-05', Type: 'تبرع', Details: 'سلة فواكه الموسم', Amount: 75, Status: 'قيد التجهيز' },
+            { id: 3, Date: '2025-08-20', Type: 'تبرع', Details: 'سلة الخضروات المتنوعة', Amount: 60, Status: 'مكتمل' },
+            { id: 4, Date: '2025-08-15', Type: 'دفع', Details: 'إضافة بطاقة ائتمان', Amount: 0, Status: 'نشط' },
+        ],
+        notifications: [
+            { id: 1, message: "تم تأكيد تبرعك لسلة الخضروات اليومية.", read: false },
+            { id: 2, message: "تم شحن تبرعك إلى جمعية البر الخيرية.", read: false },
+            { id: 3, message: "تمت إضافة طريقة دفع جديدة.", read: true },
+        ],
+        cart: []
+    };
+
+    // --- Chart Instances ---
+    let donationsChart, distributionChart;
+
+    // --- Utility Functions ---
+
+    function showToast(message, isSuccess = true) {
+        const toastEl = document.getElementById('liveToast');
+        const toastBody = document.getElementById('toastBody');
+
+        toastEl.classList.remove('bg-success', 'bg-danger', 'text-white');
+
+        if (isSuccess) {
+            toastEl.classList.add('bg-success', 'text-white');
+        } else {
+            toastEl.classList.add('bg-danger', 'text-white');
+        }
+
+        toastBody.innerHTML = message;
+
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+    }
+
+    function showSection(sectionId) {
+        document.querySelectorAll('.dashboard-section').forEach(section => {
+            section.style.display = 'none';
+        });
+        document.getElementById(sectionId).style.display = 'block';
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        document.querySelector(`.nav-link[onclick*="${sectionId}"]`).classList.add('active');
+
+        const sectionTitle = document.getElementById('sectionTitle');
+        sectionTitle.textContent = document.querySelector(`.nav-link[onclick*="${sectionId}"]`).textContent.trim();
+
+        if (sectionId === 'dashboard') {
+            updateDashboardStats();
+            initializeCharts();
+        } else if (sectionId === 'browse') {
+            renderBaskets();
+        } else if (sectionId === 'payment') {
+            renderPaymentsTable();
+        } else if (sectionId === 'donations') {
+            renderDonationsTable();
+        } else if (sectionId === 'history') {
+            renderHistoryTable();
+        }
+
+        lucide.createIcons();
+    }
+
+    function updateDashboardStats() {
+        document.getElementById('totalDonations').textContent = donorState.donations.length;
+        document.getElementById('totalBaskets').textContent = donorState.donations.reduce((sum, donation) => sum + 1, 0);
+        document.getElementById('totalAmount').textContent = donorState.donations.reduce((sum, donation) => sum + donation.Amount, 0);
+        document.getElementById('activeDonations').textContent = donorState.donations.filter(d => d.Don_Status === 'قيد التجهيز').length;
+    }
+
+    function initializeCharts() {
+        // Donations Chart
+        const donationsCtx = document.getElementById('donationsChart').getContext('2d');
+        if (donationsChart) donationsChart.destroy();
+
+        donationsChart = new Chart(donationsCtx, {
+            type: 'line',
+            data: {
+                labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر'],
+                datasets: [{
+                    label: 'قيمة التبرعات',
+                    data: [120, 190, 80, 150, 200, 170, 220, 180, 250],
+                    borderColor: '#38a169',
+                    backgroundColor: 'rgba(56, 161, 105, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+
+        // Distribution Chart
+        const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+        if (distributionChart) distributionChart.destroy();
+
+        distributionChart = new Chart(distributionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['خضار', 'فواكه', 'بقوليات'],
+                datasets: [{
+                    data: [60, 30, 10],
+                    backgroundColor: [
+                        '#38a169',
+                        '#e8a21f',
+                        '#3182ce'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        rtl: true
+                    }
+                }
+            }
+        });
+    }
+
+    function renderBaskets() {
+        const container = document.getElementById('basketsContainer');
+        container.innerHTML = '';
+
+        donorState.baskets.forEach(basket => {
+            const cropContent = basket.crops.map(c => `${c.Cro_Name} (${c.Cro_Qty})`).join('، ');
+
+            const col = document.createElement('div');
+            col.className = 'col-md-6 col-lg-4 mb-4';
+            col.innerHTML = `
+                <div class="basket-card">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">${basket.Bas_Content}</h5>
+                            <p class="card-text text-muted">${cropContent}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="h5 text-primary">${basket.Bas_Price} ر.س</span>
+                                <span class="badge bg-light text-dark">${basket.Bas_Qty} متبقي</span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <button class="btn btn-primary w-100" onclick="addToCart('${basket.Bas_ID}')">
+                                <i data-lucide="shopping-cart" class="ms-2" style="width: 16px; height: 16px;"></i>
+                                إضافة إلى السلة
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(col);
+        });
+
+        lucide.createIcons();
+    }
+
+    function filterBaskets() {
+        const searchTerm = document.getElementById('searchBasket').value.toLowerCase();
+        const typeFilter = document.getElementById('filterType').value;
+        const priceFilter = document.getElementById('filterPrice').value;
+
+        const filteredBaskets = donorState.baskets.filter(basket => {
+            // Filter by search term
+            const matchesSearch = basket.Bas_Content.toLowerCase().includes(searchTerm);
+
+            // Filter by type
+            let matchesType = true;
+            if (typeFilter) {
+                matchesType = basket.crops.some(crop => {
+                    if (typeFilter === 'خضار') return ['طماطم', 'خيار', 'جزر', 'بطاطس'].includes(crop.Cro_Name);
+                    if (typeFilter === 'فاكهة') return ['تفاح', 'مانجو', 'أناناس'].includes(crop.Cro_Name);
+                    if (typeFilter === 'بقوليات') return ['عدس', 'فول', 'حمص'].includes(crop.Cro_Name);
+                    return true;
+                });
+            }
+
+            // Filter by price
+            let matchesPrice = true;
+            if (priceFilter) {
+                if (priceFilter === '0-50') matchesPrice = basket.Bas_Price <= 50;
+                else if (priceFilter === '50-100') matchesPrice = basket.Bas_Price > 50 && basket.Bas_Price <= 100;
+                else if (priceFilter === '100+') matchesPrice = basket.Bas_Price > 100;
+            }
+
+            return matchesSearch && matchesType && matchesPrice;
+        });
+
+        // Re-render filtered baskets
+        const container = document.getElementById('basketsContainer');
+        container.innerHTML = '';
+
+        if (filteredBaskets.length === 0) {
+            container.innerHTML = '<div class="col-12 text-center py-5"><p class="text-muted">لا توجد سلال تطبيق معايير البحث.</p></div>';
+            return;
+        }
+
+        filteredBaskets.forEach(basket => {
+            const cropContent = basket.crops.map(c => `${c.Cro_Name} (${c.Cro_Qty})`).join('، ');
+
+            const col = document.createElement('div');
+            col.className = 'col-md-6 col-lg-4 mb-4';
+            col.innerHTML = `
+                <div class="basket-card">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">${basket.Bas_Content}</h5>
+                            <p class="card-text text-muted">${cropContent}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="h5 text-primary">${basket.Bas_Price} ر.س</span>
+                                <span class="badge bg-light text-dark">${basket.Bas_Qty} متبقي</span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <button class="btn btn-primary w-100" onclick="addToCart('${basket.Bas_ID}')">
+                                <i data-lucide="shopping-cart" class="ms-2" style="width: 16px; height: 16px;"></i>
+                                إضافة إلى السلة
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(col);
+        });
+
+        lucide.createIcons();
+    }
+
+    function addToCart(basketId) {
+        const basket = donorState.baskets.find(b => b.Bas_ID === basketId);
+        if (basket) {
+            // Check if basket is already in cart
+            const existingItem = donorState.cart.find(item => item.Bas_ID === basketId);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                donorState.cart.push({
+                    ...basket,
+                    quantity: 1
+                });
+            }
+
+            updateCartUI();
+            showToast(`تمت إضافة ${basket.Bas_Content} إلى السلة.`);
+        }
+    }
+
+    function removeFromCart(basketId) {
+        donorState.cart = donorState.cart.filter(item => item.Bas_ID !== basketId);
+        updateCartUI();
+        showToast(`تمت إزالة السلة من السلة.`, false);
+    }
+
+    function updateCartUI() {
+        const cartCount = document.getElementById('cartCount');
+        const cartItemsContainer = document.getElementById('cartItemsContainer');
+        const cartTotal = document.getElementById('cartTotal');
+
+        // Update cart count
+        cartCount.textContent = donorState.cart.reduce((sum, item) => sum + item.quantity, 0);
+
+        // Update cart items
+        cartItemsContainer.innerHTML = '';
+
+        if (donorState.cart.length === 0) {
+            cartItemsContainer.innerHTML = '<p class="text-muted text-center">السلة فارغة</p>';
+            cartTotal.textContent = '0 ر.س';
+            return;
+        }
+
+        let total = 0;
+
+        donorState.cart.forEach(item => {
+            const itemTotal = item.Bas_Price * item.quantity;
+            total += itemTotal;
+
+            const cartItem = document.createElement('div');
+            cartItem.className = 'cart-item';
+            cartItem.innerHTML = `
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="mb-1">${item.Bas_Content}</h6>
+                        <p class="text-muted small mb-1">${item.Bas_Price} ر.س × ${item.quantity}</p>
+                        <p class="text-primary fw-bold">${itemTotal} ر.س</p>
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger" onclick="removeFromCart('${item.Bas_ID}')">
+                        <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                    </button>
+                </div>
+            `;
+            cartItemsContainer.appendChild(cartItem);
+        });
+
+        cartTotal.textContent = `${total} ر.س`;
+        lucide.createIcons();
+    }
+
+    function proceedToDonation() {
+        if (donorState.cart.length === 0) {
+            showToast('السلة فارغة. أضف سلال للتبرع بها.', false);
+            return;
+        }
+
+        // For simplicity, we'll use the first item in cart
+        const basket = donorState.cart[0];
+        document.getElementById('selectedBasketId').value = basket.Bas_ID;
+        document.getElementById('selectedBasketName').textContent = basket.Bas_Content;
+        document.getElementById('selectedBasketPrice').textContent = basket.Bas_Price;
+
+        // Populate payment methods
+        const paymentSelect = document.getElementById('donationPayment');
+        paymentSelect.innerHTML = '<option value="" disabled selected>اختر طريقة الدفع...</option>';
+
+        donorState.payments.forEach(payment => {
+            const option = document.createElement('option');
+            option.value = payment.Pay_ID;
+            option.textContent = `${payment.Pay_Method} - ${payment.Pay_Details}`;
+            paymentSelect.appendChild(option);
+        });
+
+        // Show donation modal
+        const donationModal = new bootstrap.Modal(document.getElementById('donationModal'));
+        donationModal.show();
+    }
+
+    function renderPaymentsTable() {
+        const tableBody = document.getElementById('paymentTableBody');
+        tableBody.innerHTML = '';
+
+        donorState.payments.forEach((payment, index) => {
+            const row = tableBody.insertRow();
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${payment.Pay_Method}</td>
+                <td>${payment.Pay_Details}</td>
+                <td>${payment.Pay_Date}</td>
+                <td><span class="badge badge-success">${payment.Pay_Status}</span></td>
+                <td>
+                    <button class="btn btn-sm btn-outline-info ms-2" onclick="editPayment('${payment.Pay_ID}')">
+                        <i data-lucide="pencil" style="width: 16px; height: 16px;"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deletePayment('${payment.Pay_ID}')">
+                        <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                    </button>
+                </td>
+            `;
+        });
+
+        lucide.createIcons();
+    }
+
+    function renderDonationsTable() {
+        const tableBody = document.getElementById('donationsTableBody');
+        tableBody.innerHTML = '';
+
+        donorState.donations.forEach((donation, index) => {
+            let statusClass = 'badge text-bg-secondary';
+            if (donation.Don_Status === 'مكتمل') statusClass = 'badge badge-success';
+            else if (donation.Don_Status === 'قيد التجهيز') statusClass = 'badge badge-warning';
+
+            const row = tableBody.insertRow();
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${donation.Don_ID}</td>
+                <td>${donation.Basket}</td>
+                <td>${donation.Charity}</td>
+                <td>${donation.Amount} ر.س</td>
+                <td><span class="${statusClass}">${donation.Don_Status}</span></td>
+                <td>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="trackDonation('${donation.Don_ID}')">
+                        <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+                    </button>
+                </td>
+            `;
+        });
+
+        lucide.createIcons();
+    }
+
+    function renderHistoryTable() {
+        const tableBody = document.getElementById('historyTableBody');
+        tableBody.innerHTML = '';
+
+        donorState.history.forEach((item, index) => {
+            let statusClass = 'badge text-bg-secondary';
+            if (item.Status === 'مكتمل') statusClass = 'badge badge-success';
+            else if (item.Status === 'قيد التجهيز') statusClass = 'badge badge-warning';
+            else if (item.Status === 'نشط') statusClass = 'badge badge-success';
+
+            const row = tableBody.insertRow();
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${item.Date}</td>
+                <td>${item.Type}</td>
+                <td>${item.Details}</td>
+                <td>${item.Amount > 0 ? item.Amount + ' ر.س' : '-'}</td>
+                <td><span class="${statusClass}">${item.Status}</span></td>
+            `;
+        });
+
+        lucide.createIcons();
+    }
+
+    function renderNotifications() {
+        const notificationList = document.getElementById('notificationList');
+        const unreadCountSpan = document.getElementById('unreadCount');
+        const notificationIconBadge = document.getElementById('notificationCount');
+
+        const unread = donorState.notifications.filter(n => !n.read);
+
+        unreadCountSpan.textContent = unread.length;
+        notificationIconBadge.textContent = unread.length;
+        notificationIconBadge.style.display = unread.length > 0 ? 'inline' : 'none';
+
+        notificationList.innerHTML = '';
+
+        if (donorState.notifications.length === 0) {
+            notificationList.innerHTML = '<li class="list-group-item text-center text-muted">لا توجد إشعارات حاليًا.</li>';
+            return;
+        }
+
+        donorState.notifications.sort((a, b) => a.read - b.read).forEach(n => {
+            const item = document.createElement('li');
+            item.className = `list-group-item ${n.read ? 'text-muted' : 'fw-bold bg-light'}`;
+            item.textContent = n.message;
+            item.onclick = () => { markAsRead(n.id); };
+            notificationList.appendChild(item);
+        });
+    }
+
+    function markAsRead(id) {
+        const notification = donorState.notifications.find(n => n.id === id);
+        if (notification && !notification.read) {
+            notification.read = true;
+            renderNotifications();
+            showToast(`تم تأشير الإشعار كمقروء.`, true);
+        }
+    }
+
+    function markAllAsRead() {
+        donorState.notifications.forEach(n => n.read = true);
+        renderNotifications();
+        showToast(`تم تأشير جميع الإشعارات كمقروءة.`, true);
+        const modal = bootstrap.Modal.getInstance(document.getElementById('notificationModal'));
+        if (modal) modal.hide();
+    }
+
+    // --- Event Listeners ---
+
+    document.getElementById('paymentForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const newPayment = {
+            Pay_ID: 'PAY' + Date.now(),
+            Pay_Method: document.getElementById('pay_method').value,
+            Pay_Details: document.getElementById('pay_details').value,
+            Pay_Date: new Date().toISOString().split('T')[0],
+            Pay_Status: 'نشط'
+        };
+
+        donorState.payments.push(newPayment);
+        renderPaymentsTable();
+
+        showToast(`تمت إضافة طريقة الدفع ${newPayment.Pay_Method} بنجاح.`);
+        bootstrap.Modal.getInstance(document.getElementById('paymentModal')).hide();
+    });
+
+    document.getElementById('donationForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const basketId = document.getElementById('selectedBasketId').value;
+        const basket = donorState.baskets.find(b => b.Bas_ID === basketId);
+
+        if (basket) {
+            const newDonation = {
+                Don_ID: 'DON' + Date.now(),
+                Don_Date: new Date().toISOString().split('T')[0],
+                Don_Status: 'قيد التجهيز',
+                Basket: basket.Bas_Content,
+                Charity: document.getElementById('donationCharity').options[document.getElementById('donationCharity').selectedIndex].text,
+                Amount: basket.Bas_Price
+            };
+
+            donorState.donations.push(newDonation);
+
+            // Add to history
+            donorState.history.unshift({
+                id: donorState.history.length + 1,
+                Date: newDonation.Don_Date,
+                Type: 'تبرع',
+                Details: newDonation.Basket,
+                Amount: newDonation.Amount,
+                Status: newDonation.Don_Status
+            });
+
+            // Remove from cart
+            donorState.cart = donorState.cart.filter(item => item.Bas_ID !== basketId);
+            updateCartUI();
+
+            // Update dashboard stats
+            updateDashboardStats();
+
+            showToast(`تم تأكيد تبرعك لـ ${basket.Bas_Content} بنجاح.`);
+            bootstrap.Modal.getInstance(document.getElementById('donationModal')).hide();
+
+            // Close cart offcanvas if open
+            const cartOffcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('cartOffcanvas'));
+            if (cartOffcanvas) cartOffcanvas.hide();
+        }
+    });
+
+    document.getElementById('reportForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        if (!startDate || !endDate) {
+            showToast('يرجى اختيار تاريخ البداية والنهاية.', false);
+            return;
+        }
+
+        // Filter donations by date range
+        const filteredDonations = donorState.donations.filter(donation => {
+            const donationDate = new Date(donation.Don_Date);
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            return donationDate >= start && donationDate <= end;
+        });
+
+        const totalAmount = filteredDonations.reduce((sum, donation) => sum + donation.Amount, 0);
+
+        const reportResult = document.getElementById('reportResult');
+        reportResult.innerHTML = `
+            <h5 class="text-primary">تقرير التبرعات للفترة ${startDate} إلى ${endDate}</h5>
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <p><strong>عدد التبرعات:</strong> ${filteredDonations.length}</p>
+                    <p><strong>إجمالي المبلغ:</strong> ${totalAmount} ر.س</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>متوسط قيمة التبرع:</strong> ${filteredDonations.length > 0 ? (totalAmount / filteredDonations.length).toFixed(2) : 0} ر.س</p>
+                    <p><strong>آخر تبرع:</strong> ${filteredDonations.length > 0 ? filteredDonations[filteredDonations.length - 1].Don_Date : 'لا يوجد'}</p>
+                </div>
+            </div>
+            ${filteredDonations.length > 0 ? `
+            <div class="mt-4">
+                <h6 class="text-primary">تفاصيل التبرعات:</h6>
+                <div class="table-responsive mt-2">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>التاريخ</th>
+                                <th>السلة</th>
+                                <th>الجمعية</th>
+                                <th>المبلغ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filteredDonations.map(donation => `
+                                <tr>
+                                    <td>${donation.Don_Date}</td>
+                                    <td>${donation.Basket}</td>
+                                    <td>${donation.Charity}</td>
+                                    <td>${donation.Amount} ر.س</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            ` : ''}
+        `;
+    });
+
+    // --- Initialization ---
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Set initial active section
+        showSection('dashboard');
+
+        // Render initial data
+        renderPaymentsTable();
+        renderDonationsTable();
+        renderHistoryTable();
+        renderNotifications();
+        updateCartUI();
+
+        // Initialize Lucide icons
+        lucide.createIcons();
+    });
+
+    // Expose functions globally
+    window.showSection = showSection;
+    window.addToCart = addToCart;
+    window.removeFromCart = removeFromCart;
+    window.proceedToDonation = proceedToDonation;
+    window.filterBaskets = filterBaskets;
+    window.markAsRead = markAsRead;
+    window.markAllAsRead = markAllAsRead;
+</script>
+</body>
+</html>

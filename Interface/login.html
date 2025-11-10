@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm-to-Fork Aid - تسجيل الدخول / إنشاء حساب</title>
+    <!-- Bootstrap CSS (RTL compatible) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" xintegrity="sha384-nU14TbpK4/yWd0j2xR/w7qFgwXo9M2wTzN00gY/4/4W/n6Zg/p8dG/r7C8/T2V7zO" crossorigin="anonymous">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLMDJ8x38O7TqL3qQ5+P5+e3hYwJ7yv01j9h3K1Tq2V0O3t2P2T/4j+Wf5v/X5Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Cairo:wght@200..1000&display=swap');
+
+        /* Apply Cairo for Arabic/RTL text, Inter for Latin */
+        body {
+            font-family: 'Cairo', 'Inter', sans-serif;
+            background-color: #f7fdee; /* Light green background */
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-card {
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            max-width: 450px;
+            width: 100%;
+        }
+
+        .fresh-green {
+            color: #4CAF50;
+        }
+        .btn-green {
+            background-color: #4CAF50;
+            border-color: #4CAF50;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .btn-green:hover {
+            background-color: #388E3C;
+            border-color: #388E3C;
+        }
+        .text-gradient-earth {
+            background: linear-gradient(to left, #4CAF50, #8BC34A);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .form-control-icon {
+            padding-right: 2.25rem !important; /* Adjust padding for icon on the right in RTL */
+            padding-left: 0.75rem !important;
+        }
+
+        .form-icon-rtl {
+            position: absolute;
+            top: 50%;
+            right: 0.75rem; /* Position icon on the right */
+            transform: translateY(-50%);
+            color: #6c757d; /* muted-foreground */
+            pointer-events: none;
+            width: 1rem;
+            height: 1rem;
+        }
+
+        /* Toast styles (minimal simulation) */
+        .toast-container {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1080;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container py-5">
+    <div class="d-flex flex-column align-items-center">
+
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <a href="#" id="back-to-home" class="btn btn-link fresh-green p-0 mb-4 text-decoration-none">
+                <i class="fas fa-arrow-right me-2"></i>
+                العودة للرئيسية
+            </a>
+
+
+        </div>
+
+        <!-- Auth Card -->
+        <div class="card auth-card">
+            <div class="d-flex align-items-center justify-content-center mb-4">
+                <img src="logo.png" height="100">
+            </div>
+            <div class="card-header bg-white border-0 text-center pt-4 pb-0">
+                <h2 class="card-title fw-bold" id="card-title">مرحباً بعودتك</h2>
+                <p class="card-text text-muted" id="card-description">سجّل الدخول إلى حسابك للمتابعة</p>
+            </div>
+
+            <div class="card-body pt-3">
+                <form id="authForm" class="needs-validation" novalidate>
+
+                    <!-- Dynamic Sign Up Fields Container -->
+                    <div id="signUpFields" class="mb-4" style="display: none;">
+
+                        <!-- Full Name -->
+                        <div class="mb-3">
+                            <label for="full_name" class="form-label">الاسم بالكامل</label>
+                            <div class="position-relative">
+                                <i class="fas fa-user form-icon-rtl"></i>
+                                <input type="text" class="form-control form-control-icon" id="full_name" name="full_name" placeholder="أدخل اسمك بالكامل" required>
+                            </div>
+                        </div>
+
+                        <!-- Role Select -->
+                        <div class="mb-3">
+                            <label for="role" class="form-label">أنا...</label>
+                            <select class="form-select" id="role" name="role">
+                                <option value="donor" selected>متبرع - أريد المساعدة</option>
+                                <option value="farmer">مزارع - لدي محاصيل للمشاركة</option>
+                                <option value="charity">جمعية خيرية - أخدم المجتمعات</option>
+                            </select>
+                        </div>
+
+                        <!-- Organization/Farm Name (Conditional) -->
+                        <div class="mb-3" id="organizationGroup" style="display: none;">
+                            <label for="organization_name" class="form-label" id="organizationLabel">اسم المؤسسة</label>
+                            <div class="position-relative">
+                                <i class="fas fa-building form-icon-rtl"></i>
+                                <input type="text" class="form-control form-control-icon" id="organization_name" name="organization_name" placeholder="أدخل اسم مؤسستك">
+                            </div>
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">رقم الهاتف</label>
+                            <div class="position-relative">
+                                <i class="fas fa-phone form-icon-rtl"></i>
+                                <input type="tel" class="form-control form-control-icon" id="phone" name="phone" placeholder="أدخل رقم هاتفك">
+                            </div>
+                        </div>
+
+                        <!-- Address -->
+                        <div class="mb-3">
+                            <label for="address" class="form-label">العنوان</label>
+                            <input type="text" class="form-control" id="address" name="address" placeholder="أدخل عنوانك">
+                        </div>
+
+                        <!-- Bio -->
+                        <div class="mb-3">
+                            <label for="bio" class="form-label">نبذة عني (اختياري)</label>
+                            <textarea class="form-control" id="bio" name="bio" rows="3" placeholder="أخبرنا قليلاً عن نفسك..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label">البريد الإلكتروني</label>
+                        <div class="position-relative">
+                            <i class="fas fa-envelope form-icon-rtl"></i>
+                            <input type="email" class="form-control form-control-icon" id="email" name="email" placeholder="أدخل بريدك الإلكتروني" required>
+                        </div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-4">
+                        <label for="password" class="form-label">كلمة المرور</label>
+                        <div class="position-relative">
+                            <i class="fas fa-lock form-icon-rtl"></i>
+                            <input type="password" class="form-control form-control-icon" id="password" name="password" placeholder="أدخل كلمة المرور" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-green text-white w-100 py-2 fw-bold" id="submitButton">
+                        تسجيل الدخول
+                    </button>
+                </form>
+
+                <!-- Toggle Link -->
+                <div class="mt-4 text-center">
+                    <p class="text-muted small mb-0" id="toggleText">
+                        ليس لديك حساب؟
+                        <a href="#" class="fresh-green fw-bold text-decoration-none" id="toggleAuthMode">
+                            إنشاء حساب
+                        </a>
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container (for mock notifications) -->
+<div class="toast-container" id="toastContainer"></div>
+
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+<script>
+    // --- State Management ---
+    let isSignUp = false;
+    let isLoading = false;
+
+    // --- DOM Elements ---
+    const authForm = document.getElementById('authForm');
+    const submitButton = document.getElementById('submitButton');
+    const toggleAuthModeButton = document.getElementById('toggleAuthMode');
+    const cardTitle = document.getElementById('card-title');
+    const cardDescription = document.getElementById('card-description');
+    const toggleText = document.getElementById('toggleText');
+    const signUpFields = document.getElementById('signUpFields');
+    const roleSelect = document.getElementById('role');
+    const organizationGroup = document.getElementById('organizationGroup');
+    const organizationLabel = document.getElementById('organizationLabel');
+    const organizationNameInput = document.getElementById('organization_name');
+    const backToHome = document.getElementById('back-to-home');
+    const toastContainer = document.getElementById('toastContainer');
+
+    // --- Utility Functions ---
+
+    /**
+     * Simple Toast/Notification simulation using Bootstrap's component structure.
+     */
+    function showToast(title, description, variant = 'bg-primary') {
+        const toastHtml = `
+                <div class="toast align-items-center ${variant} text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body fw-bold">
+                            ${title}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            `;
+
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = toastHtml;
+        toastContainer.appendChild(wrapper.firstChild);
+
+        const toastEl = toastContainer.lastElementChild;
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+
+        // Clean up DOM after toast is hidden
+        toastEl.addEventListener('hidden.bs.toast', () => {
+            toastEl.remove();
+        });
+    }
+
+    /**
+     * Updates the UI state (titles, buttons, fields visibility).
+     */
+    function updateUI() {
+        // Update Card Header
+        cardTitle.textContent = isSignUp ? 'انضم إلى مجتمعنا' : 'مرحباً بعودتك';
+        cardDescription.textContent = isSignUp
+            ? 'أنشئ حسابك لبدء ربط المزارع بالمجتمعات'
+            : 'سجّل الدخول إلى حسابك للمتابعة';
+
+        // Update Toggle Link
+        toggleText.innerHTML = isSignUp
+            ? `لديك حساب بالفعل؟ <a href="#" class="fresh-green fw-bold text-decoration-none" id="toggleAuthMode">تسجيل الدخول</a>`
+            : `ليس لديك حساب؟ <a href="#" class="fresh-green fw-bold text-decoration-none" id="toggleAuthMode">إنشاء حساب</a>`;
+
+        // Reattach event listener to the new toggle link
+        document.getElementById('toggleAuthMode').addEventListener('click', toggleAuthMode);
+
+        // Update Button Text
+        submitButton.textContent = isLoading ? 'الرجاء الانتظار...' : (isSignUp ? 'إنشاء حساب' : 'تسجيل الدخول');
+        submitButton.disabled = isLoading;
+
+        // Toggle Sign Up Fields
+        signUpFields.style.display = isSignUp ? 'block' : 'none';
+
+        // Update Organization/Farm field visibility
+        updateOrganizationField();
+    }
+
+    /**
+     * Updates the conditional Farm/Organization Name field.
+     */
+    function updateOrganizationField() {
+        const role = roleSelect.value;
+        const showOrgField = role === 'farmer' || role === 'charity';
+
+        organizationGroup.style.display = showOrgField ? 'block' : 'none';
+
+        if (role === 'farmer') {
+            organizationLabel.textContent = 'اسم المزرعة';
+            organizationNameInput.placeholder = 'أدخل اسم مزرعتك';
+        } else if (role === 'charity') {
+            organizationLabel.textContent = 'اسم المؤسسة';
+            organizationNameInput.placeholder = 'أدخل اسم مؤسستك';
+        }
+    }
+
+    /**
+     * Toggles between Sign In and Sign Up mode.
+     */
+    function toggleAuthMode(e) {
+        e.preventDefault();
+        isSignUp = !isSignUp;
+        // Reset form for clean state transition
+        authForm.reset();
+        // Ensure email/password are marked as required on toggle
+        document.getElementById('email').required = true;
+        document.getElementById('password').required = true;
+
+        // Set required attributes for sign up fields only
+        document.getElementById('full_name').required = isSignUp;
+
+        updateUI();
+    }
+
+    /**
+     * Mock Supabase function for sign in.
+     */
+    async function mockSignIn(email, password) {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                if (email && password) {
+                    if (email === "error@example.com") {
+                        reject(new Error("هذا الحساب محظور مؤقتاً."));
+                    } else {
+                        // Mock success
+                        resolve({ success: true, user: { id: 'mock-user-123' } });
+                    }
+                } else {
+                    reject(new Error("البريد الإلكتروني وكلمة المرور مطلوبان."));
+                }
+            }, 1500); // Simulate network delay
+        });
+    }
+
+    /**
+     * Mock Supabase function for sign up.
+     */
+    async function mockSignUp(data) {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                if (data.email === "exists@example.com") {
+                    reject(new Error("البريد الإلكتروني مسجل بالفعل."));
+                } else if (!data.full_name) {
+                    reject(new Error("الاسم الكامل مطلوب للتسجيل."));
+                } else {
+                    // Mock success
+                    resolve({ success: true, user: { id: 'mock-new-user-456' } });
+                }
+            }, 2000); // Simulate longer network delay for sign up
+        });
+    }
+
+    /**
+     * Main form submission handler.
+     */
+    async function handleSubmit(e) {
+        e.preventDefault();
+
+        // Basic Bootstrap validation check
+        if (!authForm.checkValidity()) {
+            e.stopPropagation();
+            authForm.classList.add('was-validated');
+            return;
+        }
+
+        isLoading = true;
+        updateUI();
+
+        // Get form data
+        const formData = new FormData(authForm);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            if (isSignUp) {
+                await mockSignUp(data);
+
+                showToast('تم إنشاء الحساب بنجاح!', 'يمكنك الآن البدء باستخدام معونة من المزرعة إلى المائدة.', 'bg-success');
+
+                // Simulate navigation to home
+                console.log('Sign Up successful. Navigating to /');
+                // navigate('/');
+
+            } else {
+                await mockSignIn(data.email, data.password);
+
+                showToast('مرحباً بك مجدداً!', 'تم تسجيل الدخول إلى حسابك بنجاح.', 'bg-success');
+
+                // Simulate navigation to home
+                console.log('Sign In successful. Navigating to /');
+                // navigate('/');
+            }
+        } catch (error) {
+            showToast('خطأ في المصادقة', error.message, 'bg-danger');
+            console.error("Auth Error:", error);
+        } finally {
+            isLoading = false;
+            updateUI();
+        }
+    }
+
+    // --- Event Listeners and Initialization ---
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initial UI update
+        updateUI();
+
+        // Main form submission
+        authForm.addEventListener('submit', handleSubmit);
+
+        // Auth mode toggle
+        // Listener is attached in updateUI for the dynamic element, but we attach it here for the first time
+        document.getElementById('toggleAuthMode').addEventListener('click', toggleAuthMode);
+
+        // Role selection change handler (updates organization field)
+        roleSelect.addEventListener('change', updateOrganizationField);
+
+        // Mock navigation for "Back to Home"
+        backToHome.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('Navigating back to home page.');
+            // In a real application, you would use window.location.href = '/' or similar
+        });
+    });
+
+</script>
+</body>
+</html>
