@@ -1,0 +1,205 @@
+﻿@model Ayna.ViewModels.FarmerVMs.PerformanceReportViewModel
+@{
+    ViewData["Title"] = "تقرير الأداء والمبيعات";
+    Layout = "~/Views/Shared/_LayoutFarmer.cshtml";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h2 fw-bold mb-0 text-earth-dark">تقرير الأداء والمبيعات</h1>
+        <p class="text-muted mb-0">تحليل أداء التبرعات والمبيعات والإيرادات</p>
+    </div>
+</div>
+
+<!-- Date Filter -->
+<div class="dashboard-box mb-4">
+    <form method="get" asp-controller="Report" asp-action="PerformanceReport">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label for="startDate" class="form-label">من تاريخ</label>
+                <input type="date" class="form-control" id="startDate" name="startDate" value="@Model.StartDate.ToString("yyyy-MM-dd")">
+            </div>
+            <div class="col-md-4">
+                <label for="endDate" class="form-label">إلى تاريخ</label>
+                <input type="date" class="form-control" id="endDate" name="endDate" value="@Model.EndDate.ToString("yyyy-MM-dd")">
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-fresh-green w-100">تطبيق الفلتر</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Donation Statistics -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="dashboard-box">
+            <h4 class="h5 fw-bold text-fresh-green mb-4">إحصائيات التبرعات</h4>
+            <div class="row">
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="text-center p-3 border rounded">
+                        <i data-lucide="heart" class="text-danger mb-2" style="width: 30px; height: 30px;"></i>
+                        <h4 class="fw-bold text-danger">@Model.DonationStats.TotalDonations</h4>
+                        <p class="text-muted mb-0">إجمالي التبرعات</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="text-center p-3 border rounded">
+                        <i data-lucide="check-circle" class="text-success mb-2" style="width: 30px; height: 30px;"></i>
+                        <h4 class="fw-bold text-success">@Model.DonationStats.DeliveredDonations</h4>
+                        <p class="text-muted mb-0">تبرعات مسلمة</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="text-center p-3 border rounded">
+                        <i data-lucide="package" class="text-info mb-2" style="width: 30px; height: 30px;"></i>
+                        <h4 class="fw-bold text-info">@Model.DonationStats.TotalDonatedQuantity</h4>
+                        <p class="text-muted mb-0">كمية متبرع بها</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="text-center p-3 border rounded">
+                        <i data-lucide="users" class="text-warning mb-2" style="width: 30px; height: 30px;"></i>
+                        <h4 class="fw-bold text-warning">@(Model.DonationStats.DonationImpact)+</h4>
+                        <p class="text-muted mb-0">أسرة مستفيدة</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sales Statistics -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="dashboard-box">
+            <h4 class="h5 fw-bold text-fresh-green mb-4">إحصائيات المبيعات</h4>
+            <div class="row">
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="text-center p-3 border rounded">
+                        <i data-lucide="shopping-basket" class="text-primary mb-2" style="width: 30px; height: 30px;"></i>
+                        <h4 class="fw-bold text-primary">@Model.SalesStats.TotalBaskets</h4>
+                        <p class="text-muted mb-0">إجمالي السلال</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="text-center p-3 border rounded">
+                        <i data-lucide="trending-up" class="text-success mb-2" style="width: 30px; height: 30px;"></i>
+                        <h4 class="fw-bold text-success">@Model.SalesStats.SoldBaskets</h4>
+                        <p class="text-muted mb-0">سلال مباعة</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="text-center p-3 border rounded">
+                        <i data-lucide="credit-card" class="text-info mb-2" style="width: 30px; height: 30px;"></i>
+                        <h4 class="fw-bold text-info">@Model.SalesStats.TotalRevenue.ToString("N2") ر.س</h4>
+                        <p class="text-muted mb-0">إجمالي الإيرادات</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="text-center p-3 border rounded">
+                        <i data-lucide="dollar-sign" class="text-warning mb-2" style="width: 30px; height: 30px;"></i>
+                        <h4 class="fw-bold text-warning">@Model.SalesStats.AverageBasketPrice.ToString("N2") ر.س</h4>
+                        <p class="text-muted mb-0">متوسط سعر السلة</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Donations -->
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-box">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="h5 fw-bold text-fresh-green mb-0">أحدث التبرعات</h4>
+                <a asp-controller="Donation" asp-action="Index" class="btn btn-sm btn-outline-fresh-green">عرض الكل</a>
+            </div>
+
+            @if (Model.Donations.Any())
+            {
+                <div class="list-group list-group-flush">
+                    @foreach (var donation in Model.Donations.Take(5))
+                    {
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">تبرع #@donation.DonId</h6>
+                                    <small class="text-muted">
+                                        @{
+                                            var cropTexts = donation.DonationCrops.Select(dc => $"{dc.Cro.CroName} ({dc.DcQuantity})");
+                                        }
+                                        @string.Join(", ", cropTexts)
+                                    </small>
+                                </div>
+                                @{
+                                    var badgeClass = donation.DonStatus switch
+                                    {
+                                        "Pending" => "bg-warning",
+                                        "Approved" => "bg-success",
+                                        "Delivered" => "bg-info",
+                                        _ => "bg-secondary"
+                                    };
+                                }
+                                <span class="badge @badgeClass">
+                                    @donation.DonStatus
+                                </span>
+                            </div>
+                            <small class="text-muted">@donation.DonDate.ToString("yyyy-MM-dd")</small>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="text-muted text-center py-3">لا توجد تبرعات في الفترة المحددة</p>
+            }
+        </div>
+    </div>
+
+    <!-- Recent Baskets -->
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-box">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="h5 fw-bold text-fresh-green mb-0">أفضل السلال مبيعاً</h4>
+                <a asp-controller="Basket" asp-action="Index" class="btn btn-sm btn-outline-fresh-green">عرض الكل</a>
+            </div>
+
+            @if (Model.Baskets.Any())
+            {
+                <div class="list-group list-group-flush">
+                    @foreach (var basket in Model.Baskets.OrderByDescending(b => b.Carts.Sum(c => c.CartQty)).Take(5))
+                    {
+                        var soldCount = basket.Carts.Sum(c => c.CartQty);
+                        var basketQuantity = basket.BasQty ?? 1; // Handle null case
+                        var progress = Math.Min(100, (soldCount / (double)Math.Max(1, basketQuantity)) * 100);
+
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">@basket.BasContent</h6>
+                                    <small class="text-muted">@basket.BasPrice?.ToString("N2") ر.س</small>
+                                </div>
+                                <span class="badge bg-success">@soldCount مبيع</span>
+                            </div>
+                            <div class="progress mt-2" style="height: 8px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: @progress%"></div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="text-muted text-center py-3">لا توجد سلال مضافة</p>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        lucide.createIcons();
+    </script>
+}

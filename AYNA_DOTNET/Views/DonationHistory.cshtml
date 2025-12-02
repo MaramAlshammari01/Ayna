@@ -1,0 +1,128 @@
+﻿@model Ayna.ViewModels.DonorVMs.DonationHistoryReportViewModel
+@{
+    ViewData["Title"] = "سجل التبرعات";
+    Layout = "~/Views/Shared/_DonorLayout.cshtml";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 fw-bold mb-0 text-dark">سجل التبرعات</h1>
+                <p class="text-muted mb-0">عرض سجل كامل لجميع تبرعاتك</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Section -->
+<div class="dashboard-box mb-4">
+    <h5 class="fw-bold text-primary mb-3">فلترة التبرعات</h5>
+    <form method="get" asp-action="DonationHistoryReport" asp-controller="Report" asp-area="Donor">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label for="startDate" class="form-label">من تاريخ</label>
+                <input type="date" class="form-control" id="startDate" name="startDate"
+                       value="@Model.StartDate?.ToString("yyyy-MM-dd")">
+            </div>
+            <div class="col-md-3">
+                <label for="endDate" class="form-label">إلى تاريخ</label>
+                <input type="date" class="form-control" id="endDate" name="endDate"
+                       value="@Model.EndDate?.ToString("yyyy-MM-dd")">
+            </div>
+            <div class="col-md-3">
+                <label for="status" class="form-label">حالة التبرع</label>
+                <select class="form-select" id="status" name="status">
+                    <option value="">الكل</option>
+                    <option value="Pending" selected="@(Model.StatusFilter == "Pending")">قيد الانتظار</option>
+                    <option value="Paid" selected="@(Model.StatusFilter == "Paid")">مدفوع</option>
+                    <option value="Delivered" selected="@(Model.StatusFilter == "Delivered")">تم التسليم</option>
+                    <option value="Cancelled" selected="@(Model.StatusFilter == "Cancelled")">ملغي</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <div class="d-flex gap-2 w-100">
+                    <button type="submit" class="btn btn-primary flex-grow-1">تطبيق الفلترة</button>
+                    <a asp-action="DonationHistoryReport" asp-controller="Report" asp-area="Donor"
+                       class="btn btn-outline-secondary">إعادة تعيين</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm bg-light">
+            <div class="card-body text-center">
+                <h3 class="text-primary fw-bold">@Model.DonationsCount</h3>
+                <p class="mb-0 text-muted">عدد التبرعات</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm bg-light">
+            <div class="card-body text-center">
+                <h3 class="text-success fw-bold">@Model.TotalAmount.ToString("N2") ر.س</h3>
+                <p class="mb-0 text-muted">إجمالي المبلغ</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Donations Table -->
+<div class="dashboard-box">
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>رقم التبرع</th>
+                    <th>التاريخ</th>
+                    <th>الجمعية</th>
+                    <th>المبلغ</th>
+                    <th>الحالة</th>
+                    <th>عدد السلال</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Donations != null && Model.Donations.Any())
+                {
+                    @foreach (var donation in Model.Donations)
+                    {
+                        <tr>
+                            <td>#@donation.OrdId</td>
+                            <td>@Helpers.FormatDate(donation.OrdDate)</td>
+                            <td>@donation.CharityName</td>
+                            <td class="fw-bold text-success">@donation.OrdPrice?.ToString("N2") ر.س</td>
+                            <td>
+                                <span class="badge bg-@Helpers.GetStatusColor(donation.OrdStatus)">
+                                    @donation.OrdStatus
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-info">@donation.ItemsCount سلة</span>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-4">
+                            <i data-lucide="inbox" class="text-muted mb-2" style="width: 48px; height: 48px;"></i>
+                            <p class="text-muted mb-0">لا توجد تبرعات لعرضها</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+}

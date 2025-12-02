@@ -1,0 +1,189 @@
+﻿@{
+    ViewBag.Title = "الصفحة الرئيسية";
+}
+
+<section class="hero-bg-placeholder position-relative overflow-hidden">
+    <div class="hero-overlay"></div>
+    <div class="container position-relative z-1 py-5 py-lg-7">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="space-y-4">
+                    <h1 class="display-4 fw-bold lh-sm mb-4">
+                        <span class="text-gradient-hero">نربط المزارع</span>
+                        <br>
+                        بـ
+                        <span class="text-gradient-hero">المجتمعات</span>
+                    </h1>
+                    <p class="lead text-muted max-w-lg mb-5">
+                        سد الفجوة بين فائض المحاصيل والمحتاجين. تمكين المزارعين، وتسهيل التبرعات، ودعم الجمعيات الخيرية لإنشاء نظام بيئي مستدام للغذاء.
+                    </p>
+                </div>
+
+                <div class="d-flex flex-column flex-sm-row gap-3 mb-5">
+                    <button type="button" class="btn btn-fresh-green btn-lg" data-bs-toggle="modal" data-bs-target="#registerModal">
+                        ابدأ التبرع <i data-lucide="arrow-left" class="me-2-rtl"></i>
+                    </button>
+                    
+                    <a asp-controller="Front" asp-action="HowItWorks" class="btn btn-outline-fresh-green btn-lg">
+                        اعرف المزيد
+                    </a>
+                </div>
+            </div>
+        </div>
+        <!-- الإحصائيات -->
+        <div class="row pt-4 col-md-9 mt-4 pb-4 border-top border-secondary-subtle stats123">
+            <div class="col-4 text-center">
+                <div class="icon-bg-fresh-green rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-2" style="width: 48px; height: 48px;">
+                    <i data-lucide="sprout" class="h-6 w-6 text-fresh-green"></i>
+                </div>
+                <div class="fs-4 fw-bold text-fresh-green">500+</div>
+                <div class="small text-muted">مزارعين</div>
+            </div>
+            <div class="col-4 text-center">
+                <div class="icon-bg-harvest-gold rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-2" style="width: 48px; height: 48px;">
+                    <i data-lucide="heart" class="h-6 w-6 text-harvest-gold"></i>
+                </div>
+                <div class="fs-4 fw-bold text-harvest-gold">10K+</div>
+                <div class="small text-muted">تبرعات</div>
+            </div>
+            <div class="col-4 text-center">
+                <div class="icon-bg-earth-brown rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-2" style="width: 48px; height: 48px;">
+                    <i data-lucide="users" class="h-6 w-6 text-earth-brown"></i>
+                </div>
+                <div class="fs-4 fw-bold text-earth-brown">100+</div>
+                <div class="small text-muted">جمعيات خيرية</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="user-types" class="py-5 py-lg-7 bg-white">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold mb-3">
+                اختر <span class="text-gradient-earth">دورك</span>
+            </h2>
+            <p class="lead text-muted max-w-2xl mx-auto">
+                سواء كنت تزرع أو تتبرع أو توزع، انضم إلى مجتمعنا الذي يعمل معًا لتقليل هدر الطعام ودعم المحتاجين.
+            </p>
+        </div>
+
+        <div class="row justify-content-center g-4">
+            <!-- بطاقة المزارع -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 rounded-3 shadow-soft card-hover" style="background-color: var(--bs-light);">
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="text-center mb-4">
+                            <div class="icon-bg-fresh-green rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 64px; height: 64px;">
+                                <i data-lucide="sprout" class="h-8 w-8 text-fresh-green"></i>
+                            </div>
+                            <h3 class="fs-4 fw-bold mb-2">أنا مزارع</h3>
+                            <p class="text-muted small leading-relaxed">شارك فائض محاصيلك وتواصل مباشرة مع المتبرعين والجمعيات الخيرية. حول حصادك الفائض إلى دعم مجتمعي.</p>
+                        </div>
+
+                        <ul class="list-unstyled space-y-3 mb-4">
+                            <li class="d-flex align-items-start">
+                                <div class="rounded-circle bg-fresh-green mt-2 ms-2 flex-shrink-0" style="width: 8px; height: 8px;"></div>
+                                <span class="small">إدراج فائض المحاصيل للتبرع</span>
+                            </li>
+                            <li class="d-flex align-items-start">
+                                <div class="rounded-circle bg-fresh-green mt-2 ms-2 flex-shrink-0" style="width: 8px; height: 8px;"></div>
+                                <span class="small">استلام مدفوعات مباشرة من المتبرعين</span>
+                            </li>
+                            <li class="d-flex align-items-start">
+                                <div class="rounded-circle bg-fresh-green mt-2 ms-2 flex-shrink-0" style="width: 8px; height: 8px;"></div>
+                                <span class="small">التواصل مع الجمعيات الخيرية المحلية</span>
+                            </li>
+                        </ul>
+
+                        <button type="button" class="btn btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#registerModal">
+                            ابدأ الآن <i data-lucide="arrow-left" class="me-2-rtl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- بطاقة المتبرع -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 rounded-3 shadow-soft card-hover" style="background-color: var(--bs-light);">
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="text-center mb-4">
+                            <div class="icon-bg-harvest-gold rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 64px; height: 64px;">
+                                <i data-lucide="heart" class="h-8 w-8 text-harvest-gold"></i>
+                            </div>
+                            <h3 class="fs-4 fw-bold mb-2">أرغب في التبرع</h3>
+                            <p class="text-muted small leading-relaxed">ادعم المزارعين والمجتمعات المحلية بشراء سلال المحاصيل التي تذهب مباشرة للجمعيات الخيرية المحتاجة.</p>
+                        </div>
+
+                        <ul class="list-unstyled space-y-3 mb-4">
+                            <li class="d-flex align-items-start">
+                                <div class="rounded-circle bg-harvest-gold mt-2 ms-2 flex-shrink-0" style="width: 8px; height: 8px;"></div>
+                                <span class="small">تصفح المحاصيل المتاحة</span>
+                            </li>
+                            <li class="d-flex align-items-start">
+                                <div class="rounded-circle bg-harvest-gold mt-2 ms-2 flex-shrink-0" style="width: 8px; height: 8px;"></div>
+                                <span class="small">الدفع للمزارعين مباشرة بالبطاقة</span>
+                            </li>
+                            <li class="d-flex align-items-start">
+                                <div class="rounded-circle bg-harvest-gold mt-2 ms-2 flex-shrink-0" style="width: 8px; height: 8px;"></div>
+                                <span class="small">تتبع تبرعاتك حتى التسليم</span>
+                            </li>
+                            <li class="d-flex align-items-start">
+                                <div class="rounded-circle bg-harvest-gold mt-2 ms-2 flex-shrink-0" style="width: 8px; height: 8px;"></div>
+                                <span class="small">شاهد الأثر الحقيقي على المجتمعات</span>
+                            </li>
+                        </ul>
+
+                        <button type="button" class="btn btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#registerModal">
+                            ابدأ الآن <i data-lucide="arrow-left" class="me-2-rtl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- بطاقة الجمعية الخيرية -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 rounded-3 shadow-soft card-hover" style="background-color: var(--bs-light);">
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="text-center mb-4">
+                            <div class="icon-bg-earth-brown rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 64px; height: 64px;">
+                                <i data-lucide="building-2" class="h-8 w-8 text-earth-brown"></i>
+                            </div>
+                            <h3 class="fs-4 fw-bold mb-2">أنا جمعية خيرية</h3>
+                            <p class="text-muted small leading-relaxed">استلم تبرعات المنتجات الطازجة من المزارعين المحليين ونسق عملية الاستلام لخدمة مجتمعك.</p>
+                        </div>
+
+                        <ul class="list-unstyled space-y-3 mb-4">
+                            <li class="d-flex align-items-start">
+                                <div class="rounded-circle bg-earth-brown mt-2 ms-2 flex-shrink-0" style="width: 8px; height: 8px;"></div>
+                                <span class="small">عرض طلبات التبرع من المزارعين</span>
+                            </li>
+                            <li class="d-flex align-items-start">
+                                <div class="rounded-circle bg-earth-brown mt-2 ms-2 flex-shrink-0" style="width: 8px; height: 8px;"></div>
+                                <span class="small">قبول التبرعات بناءً على الاحتياجات</span>
+                            </li>
+                            <li class="d-flex align-items-start">
+                                <div class="rounded-circle bg-earth-brown mt-2 ms-2 flex-shrink-0" style="width: 8px; height: 8px;"></div>
+                                <span class="small">ترتيب لوجستيات الاستلام</span>
+                            </li>
+                            <li class="d-flex align-items-start">
+                                <div class="rounded-circle bg-earth-brown mt-2 ms-2 flex-shrink-0" style="width: 8px; height: 8px;"></div>
+                                <span class="small">توزيعها على أفراد المجتمع</span>
+                            </li>
+                        </ul>
+
+                        <button type="button" class="btn btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#registerModal">
+                            ابدأ الآن <i data-lucide="arrow-left" class="me-2-rtl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        lucide.createIcons();
+    </script>
+}

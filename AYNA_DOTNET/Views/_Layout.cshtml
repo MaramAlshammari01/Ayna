@@ -1,0 +1,175 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - أينع</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Replace FontAwesome kit with official CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+          integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link href="~/css/custom.css" rel="stylesheet">
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body class="bg-light min-vh-100">
+
+    <!-- شريط التنقل -->
+    <nav class="navbar navbar-expand-md navbar-light bg-light sticky-top shadow-sm" style="--bs-bg-opacity: .95; backdrop-filter: blur(5px);padding: 0;">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" asp-controller="Front" asp-action="Home">
+                <img src="~/logo.png" height="75" alt="أينع">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="تبديل التنقل">
+                <i data-lucide="menu"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto mb-2 mb-md-0 d-none d-md-flex">
+                    <li class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Home" ? "active-nav" : "")">
+                        <a class="nav-link text-earth-brown text-decoration-none fw-medium" asp-controller="Front" asp-action="Home">الرئيسية</a>
+                    </li>
+                    @* <li class="nav-item">
+                        <a class="nav-link text-earth-brown text-decoration-none fw-medium" asp-controller="Crop" asp-action="Index">تصفح المحاصيل</a>
+                    </li> *@
+                    <li class="nav-item">
+                        <a class="nav-link text-earth-brown text-decoration-none fw-medium" asp-controller="Front" asp-action="HowItWorks">كيف نعمل</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-earth-brown text-decoration-none fw-medium" asp-controller="Front" asp-action="Contact">تواصل معنا</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center gap-2">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <span class="text-muted small">مرحباً، @User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value</span>
+                        <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-danger btn-sm">تسجيل الخروج</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#loginModal">تسجيل الدخول</button>
+                        <button type="button" class="btn btn-fresh-green btn-sm" data-bs-toggle="modal" data-bs-target="#registerModal">ابدأ الآن</button>
+                    }
+                </div>
+                <div class="d-block d-md-none border-top mt-3 pt-3">
+                    <a class="dropdown-item text-earth-brown fw-medium" asp-controller="Front" asp-action="Home" data-bs-toggle="collapse">الرئيسية</a>
+                    @* <a class="dropdown-item text-earth-brown fw-medium" asp-controller="Crop" asp-action="Index" data-bs-toggle="collapse">تصفح المحاصيل</a> *@
+                    <a class="dropdown-item text-earth-brown fw-medium" asp-controller="Front" asp-action="HowItWorks" data-bs-toggle="collapse">كيف نعمل</a>
+                    <a class="dropdown-item text-earth-brown fw-medium" data-bs-toggle="collapse" asp-controller="Front" asp-action="Contact">تواصل معنا</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Toast Container for Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+            <div class="toast show align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        @TempData["SuccessMessage"]
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+            <div class="toast show align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        @TempData["ErrorMessage"]
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @RenderBody()
+
+    <footer id="footer" class="bg-earth-dark text-white py-4 py-lg-7">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4 col-lg-3">
+                    <div class="space-y-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <img src="~/logo.png" height="60" alt="أينع">
+                        </div>
+                        <p class="text-secondary small text-white leading-relaxed">
+                            نربط المزارع بالمجتمعات لتقليل هدر الطعام ودعم المحتاجين.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-2 col-lg-3">
+                    <h4 class="fw-semibold mb-3 text-white">روابط سريعة</h4>
+                    <ul class="list-unstyled space-y-2 small">
+                        <li><a asp-controller="Front" asp-action="HowItWorks" class="text-secondary text-decoration-none text-white">كيف نعمل</a></li>
+                        <li><a asp-controller="Front" asp-action="Contact" class="text-secondary text-decoration-none text-white">تواصل معنا</a></li>
+                        <li><a data-bs-toggle="modal" data-bs-target="#registerModal" class="text-secondary text-decoration-none text-white">ابدأ الآن</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-6 col-md-3 col-lg-3">
+                    <h4 class="fw-semibold mb-3 text-white">للمستخدمين</h4>
+                    <ul class="list-unstyled space-y-2 small">
+                        <li><a href="#" class="text-secondary text-decoration-none text-white">المزارعون</a></li>
+                        <li><a href="#" class="text-secondary text-decoration-none text-white">المتبرعون</a></li>
+                        <li><a href="#" class="text-secondary text-decoration-none text-white">الجمعيات الخيرية</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-md-3 col-lg-3">
+                    <h4 class="fw-semibold mb-3 text-white">تواصل معنا</h4>
+                    <div class="space-y-2 small text-secondary">
+                        <div class="d-flex align-items-center text-white">
+                            <i class="fas fa-envelope h-4 w-4 ms-2-rtl"></i>
+                            <span>hello@ayna.com</span>
+                        </div>
+                        <div class="d-flex align-items-center text-white">
+                            <i class="fas fa-phone h-4 w-4 ms-2-rtl"></i>
+                            <span>+966523254255</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-top border-secondary-subtle mt-1 pt-2 text-center small text-secondary">
+                <p class="mb-0 text-white">&copy; 2025 أينع . جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    @await Html.PartialAsync("_LoginRegisterModals")
+
+    <!-- Removed the problematic FontAwesome kit script -->
+    <script src="~/js/custom.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        lucide.createIcons();
+
+        // Auto hide toasts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            var toasts = document.querySelectorAll('.toast');
+            toasts.forEach(function(toast) {
+                setTimeout(function() {
+                    var bsToast = new bootstrap.Toast(toast);
+                    bsToast.hide();
+                }, 5000);
+            });
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

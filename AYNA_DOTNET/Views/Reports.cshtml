@@ -1,0 +1,184 @@
+﻿@model Ayna.ViewModels.AdminVMs.DonationReportsViewModel
+@{
+    ViewBag.Title = "تقارير التبرعات - المدير";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h2 fw-bold mb-0 text-dark">تقارير التبرعات</h1>
+        <p class="text-muted mb-0">إحصائيات وتحليلات التبرعات في النظام</p>
+    </div>
+</div>
+
+<!-- Donation Statistics -->
+<div class="row mb-4">
+    <div class="col-md-2 col-sm-6 mb-3">
+        <div class="stat-card text-center">
+            <i data-lucide="package" class="text-primary mb-2" style="width: 36px; height: 36px;"></i>
+            <h4 class="stat-number">@Model.DonationStats.Total</h4>
+            <p class="stat-label">إجمالي التبرعات</p>
+        </div>
+    </div>
+
+    <div class="col-md-2 col-sm-6 mb-3">
+        <div class="stat-card text-center">
+            <i data-lucide="clock" class="text-warning mb-2" style="width: 36px; height: 36px;"></i>
+            <h4 class="stat-number">@Model.DonationStats.Pending</h4>
+            <p class="stat-label">قيد الانتظار</p>
+        </div>
+    </div>
+
+    <div class="col-md-2 col-sm-6 mb-3">
+        <div class="stat-card text-center">
+            <i data-lucide="check-circle" class="text-info mb-2" style="width: 36px; height: 36px;"></i>
+            <h4 class="stat-number">@Model.DonationStats.Approved</h4>
+            <p class="stat-label">مقبولة</p>
+        </div>
+    </div>
+
+    <div class="col-md-2 col-sm-6 mb-3">
+        <div class="stat-card text-center">
+            <i data-lucide="truck" class="text-success mb-2" style="width: 36px; height: 36px;"></i>
+            <h4 class="stat-number">@Model.DonationStats.Delivered</h4>
+            <p class="stat-label">تم التسليم</p>
+        </div>
+    </div>
+
+    <div class="col-md-2 col-sm-6 mb-3">
+        <div class="stat-card text-center">
+            <i data-lucide="x-circle" class="text-danger mb-2" style="width: 36px; height: 36px;"></i>
+            <h4 class="stat-number">@Model.DonationStats.Rejected</h4>
+            <p class="stat-label">مرفوضة</p>
+        </div>
+    </div>
+
+    <div class="col-md-2 col-sm-6 mb-3">
+        <div class="stat-card text-center">
+            <i data-lucide="activity" class="text-dark mb-2" style="width: 36px; height: 36px;"></i>
+            <h4 class="stat-number">@(Model.DonationStats.Total - Model.DonationStats.Rejected)</h4>
+            <p class="stat-label">نشطة</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Top Farmers -->
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-box">
+            <h4 class="h5 fw-bold text-primary mb-4">أفضل المزارعين بالتبرعات</h4>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>المزارع</th>
+                            <th>الموقع</th>
+                            <th>عدد التبرعات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.TopFarmers != null && Model.TopFarmers.Any())
+                        {
+                            @foreach (var farmer in Model.TopFarmers.Select((f, i) => new { Farmer = f, Index = i + 1 }))
+                            {
+                                <tr>
+                                    <td>@farmer.Index</td>
+                                    <td>@farmer.Farmer.FarmerName</td>
+                                    <td>@farmer.Farmer.FarLocation</td>
+                                    <td>
+                                        <span class="badge bg-primary">@farmer.Farmer.DonationsCount</span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-4">
+                                    <i data-lucide="users" class="text-muted mb-2" style="width: 48px; height: 48px;"></i>
+                                    <p class="text-muted mb-0">لا توجد بيانات</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Charities -->
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-box">
+            <h4 class="h5 fw-bold text-primary mb-4">أفضل الجمعيات بالمستلم</h4>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>الجمعية</th>
+                            <th>الموقع</th>
+                            <th>عدد التبرعات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.TopCharities != null && Model.TopCharities.Any())
+                        {
+                            @foreach (var charity in Model.TopCharities.Select((c, i) => new { Charity = c, Index = i + 1 }))
+                            {
+                                <tr>
+                                    <td>@charity.Index</td>
+                                    <td>@charity.Charity.CharName</td>
+                                    <td>@charity.Charity.CharLocation</td>
+                                    <td>
+                                        <span class="badge bg-success">@charity.Charity.ReceivedDonationsCount</span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-4">
+                                    <i data-lucide="heart-handshake" class="text-muted mb-2" style="width: 48px; height: 48px;"></i>
+                                    <p class="text-muted mb-0">لا توجد بيانات</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Awards Section -->
+@if (Model.TopCharities != null && Model.TopCharities.Any(c => c.ReceivedDonationsCount >= 2))
+{
+    <div class="dashboard-box">
+        <h4 class="h5 fw-bold text-primary mb-4">جوائز الجمعيات</h4>
+        <div class="row">
+            @foreach (var charity in Model.TopCharities.Where(c => c.ReceivedDonationsCount >= 2))
+            {
+                <div class="col-md-4 mb-3">
+                    <div class="card border-0 shadow-sm bg-gold text-white">
+                        <div class="card-body text-center">
+                            <i data-lucide="award" style="width: 48px; height: 48px;" class="mb-3"></i>
+                            <h5 class="fw-bold">@charity.CharName</h5>
+                            <p class="mb-2">حصلت على جائزة التميز</p>
+                            <span class="badge bg-light text-dark">@charity.ReceivedDonationsCount تبرع</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@section Styles {
+    <style>
+        .bg-gold {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+        }
+    </style>
+}

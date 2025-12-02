@@ -1,0 +1,115 @@
+﻿@model Ayna.ViewModels.FarmerVMs.UpdateFarmerProfileViewModel
+@{
+    ViewData["Title"] = "الملف الشخصي - تحديث المعلومات";
+    Layout = "~/Views/Shared/_LayoutFarmer.cshtml";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h2 fw-bold mb-0 text-earth-dark">الملف الشخصي</h1>
+        <p class="text-muted mb-0">تحديث معلومات المزارع والاتصال</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="dashboard-box">
+            <h4 class="h5 fw-bold text-fresh-green mb-4">تحديث المعلومات الشخصية</h4>
+
+            <form method="post" asp-controller="Farmer" asp-action="UpdateProfile">
+                @Html.AntiForgeryToken()
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="FarFirstName" class="form-label">الاسم الأول</label>
+                        <input asp-for="FarFirstName" class="form-control" required />
+                        <span asp-validation-for="FarFirstName" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="FarLastName" class="form-label">اسم العائلة</label>
+                        <input asp-for="FarLastName" class="form-control" required />
+                        <span asp-validation-for="FarLastName" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="UserPhone" class="form-label">رقم الهاتف</label>
+                        <input asp-for="UserPhone" type="tel" class="form-control" required />
+                        <span asp-validation-for="UserPhone" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="FarLocation" class="form-label">موقع المزرعة</label>
+                        <input asp-for="FarLocation" class="form-control" required />
+                        <span asp-validation-for="FarLocation" class="text-danger"></span>
+                    </div>
+
+                    <!-- Email Field -->
+                    <div class="col-md-12">
+                        <label asp-for="UserEmail" class="form-label">البريد الإلكتروني</label>
+                        <input asp-for="UserEmail" type="email" class="form-control" required />
+                        <span asp-validation-for="UserEmail" class="text-danger"></span>
+                    </div>
+
+                    <!-- Password Field (Optional) -->
+                    <div class="col-md-6">
+                        <label asp-for="Password" class="form-label">كلمة المرور الجديدة (اختياري)</label>
+                        <input asp-for="Password" type="password" class="form-control"
+                               placeholder="اتركه فارغاً إذا لم ترد التغيير" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <!-- Password Confirmation -->
+                    <div class="col-md-6">
+                        <label asp-for="PasswordConfirmation" class="form-label">تأكيد كلمة المرور الجديدة</label>
+                        <input asp-for="PasswordConfirmation" type="password" class="form-control"
+                               placeholder="أعد إدخال كلمة المرور الجديدة" />
+                        <span asp-validation-for="PasswordConfirmation" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-fresh-green">
+                            <i data-lucide="save" class="ms-2" style="width: 16px; height: 16px;"></i>
+                            حفظ التحديثات
+                        </button>
+                        <a asp-controller="Farmer" asp-action="Dashboard" class="btn btn-outline-secondary">
+                            إلغاء
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="dashboard-box">
+            <h4 class="h5 fw-bold text-fresh-green mb-4">معلومات الحساب</h4>
+
+            <div class="mb-3">
+                <strong>البريد الإلكتروني:</strong>
+                <p class="text-muted">@Model.UserEmail</p>
+            </div>
+
+            <div class="mb-3">
+                <strong>نوع المستخدم:</strong>
+                <p class="text-muted">مزارع</p>
+            </div>
+
+            <div class="mb-3">
+                <strong>حالة الحساب:</strong>
+                <span class="badge bg-success">نشط</span>
+            </div>
+
+            <div class="alert alert-info mt-4">
+                <i data-lucide="info" class="ms-2" style="width: 16px; height: 16px;"></i>
+                <small class="d-block">لن يتم تغيير كلمة المرور إلا إذا قمت بإدخال كلمة مرور جديدة.</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        lucide.createIcons();
+    </script>
+}

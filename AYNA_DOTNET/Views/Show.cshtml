@@ -1,0 +1,190 @@
+﻿@model Ayna.ViewModels.CharityVMs.OrderDetailsViewModel
+@{
+    ViewData["Title"] = "تفاصيل الطلب - " + Model.OrdId;
+    Layout = "~/Views/Shared/_CharityLayout.cshtml";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 fw-bold mb-0 text-dark">تفاصيل الطلب</h1>
+                <p class="text-muted mb-0">رقم الطلب: #@Model.OrdId</p>
+            </div>
+            <a asp-action="Orders" asp-controller="Charity" class="btn btn-outline-secondary">
+                <i data-lucide="arrow-right" class="ms-2" style="width: 16px; height: 16px;"></i>
+                العودة للقائمة
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="dashboard-box">
+            <h4 class="h5 fw-bold text-primary mb-4">معلومات الطلب</h4>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <strong>المتبرع:</strong>
+                        <p class="text-muted">@Model.DonorName</p>
+                    </div>
+                    <div class="mb-3">
+                        <strong>تاريخ الطلب:</strong>
+                        @* <p class="text-muted">@Ayna.Helpers.Helpers.FormatDate(Model.OrdDate)</p>*@ 
+                        <p class="text-muted">@Helpers.FormatDate(Model.OrdDate?.ToDateTime(TimeOnly.MinValue))</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <strong>حالة الطلب:</strong>
+                        <span class="badge bg-@Helpers.GetStatusColor(Model.OrdStatus)">
+                            @Model.OrdStatus
+                        </span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>المبلغ الإجمالي:</strong>
+                        <p class="fw-bold text-success">@Model.OrdPrice?.ToString("F2") ر.س</p>
+                    </div>
+                </div>
+            </div>
+
+            <h5 class="fw-bold text-dark mt-4 mb-3">تفاصيل العناصر</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>اسم السلة</th>
+                            <th>الكمية</th>
+                            <th>السعر</th>
+                            <th>الإجمالي</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Items != null && Model.Items.Any())
+                        {
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td>@item.BasketName</td>
+                                    <td>@item.Quantity</td>
+                                    <td>@item.Price?.ToString("F2") ر.س</td>
+                                    <td class="fw-bold">@item.TotalPrice?.ToString("F2") ر.س</td>
+                                </tr>
+                            }
+                            <tr class="table-light">
+                                <td colspan="3" class="text-end fw-bold">المجموع الكلي:</td>
+                                <td class="fw-bold text-success">@Model.OrdPrice?.ToString("F2") ر.س</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center">لا توجد عناصر</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (Model.PaymentInfo != null)
+            {
+                <h5 class="fw-bold text-dark mt-4 mb-3">معلومات الدفع</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>طريقة الدفع:</strong>
+                            <p class="text-muted">@Model.PaymentInfo.PayMethod</p>
+                        </div>
+                        <div class="mb-3">
+                            <strong>المبلغ المدفوع:</strong>
+                            <p class="text-muted">@Model.PaymentInfo.PayAmount?.ToString("F2") ر.س</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>حالة الدفع:</strong>
+                            <span class="badge bg-@Helpers.GetStatusColor(Model.PaymentInfo.PayStatus)">
+                                @Model.PaymentInfo.PayStatus
+                            </span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>رقم المعاملة:</strong>
+                            <p class="text-muted">@Model.PaymentInfo.TransactionId</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="dashboard-box">
+            <h4 class="h5 fw-bold text-primary mb-4">ملخص الطلب</h4>
+
+            <div class="mb-3">
+                <strong>رقم الطلب:</strong>
+                <p class="text-muted">#@Model.OrdId</p>
+            </div>
+
+            <div class="mb-3">
+                <strong>المتبرع:</strong>
+                <p class="text-muted">@Model.DonorName</p>
+            </div>
+
+            <div class="mb-3">
+                <strong>عدد العناصر:</strong>
+                <p class="text-muted">@Model.Items?.Count عنصر</p>
+            </div>
+
+            <div class="mb-3">
+                <strong>المبلغ الإجمالي:</strong>
+                <p class="fw-bold text-success">@Model.OrdPrice?.ToString("F2") ر.س</p>
+            </div>
+
+            <div class="mb-3">
+                <strong>حالة الطلب:</strong>
+                <span class="badge bg-@Helpers.GetStatusColor(Model.OrdStatus)">
+                    @Model.OrdStatus
+                </span>
+            </div>
+
+            <div class="mb-3">
+                <strong>تاريخ الطلب:</strong>
+                @* <p class="text-muted">@Ayna.Helpers.Helpers.FormatDate(Model.OrdDate)</p> *@
+                <p class="text-muted">@Helpers.FormatDate(Model.OrdDate?.ToDateTime(TimeOnly.MinValue))</p>
+            </div>
+
+            @if (Model.OrdTime.HasValue)
+            {
+                <div class="mb-3">
+                    <strong>وقت الطلب:</strong>
+                    <p class="text-muted">@Helpers.FormatTime(Model.OrdTime)</p>
+                </div>
+            }
+
+            <div class="alert alert-light mt-3">
+                <small class="text-muted">
+                    <i data-lucide="info" class="ms-2" style="width: 14px; height: 14px;"></i>
+                    تاريخ الإنشاء: @Helpers.FormatDateTimeArabic(Model.AddedAt)
+                </small>
+            </div>
+
+            @if (Model.OrdStatus == "Completed")
+            {
+                <div class="alert alert-success">
+                    <i data-lucide="check-circle" class="ms-2" style="width: 16px; height: 16px;"></i>
+                    <strong>تم الاستلام:</strong> تم تأكيد استلام هذا الطلب.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+}

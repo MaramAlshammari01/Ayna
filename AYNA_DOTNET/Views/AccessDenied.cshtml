@@ -1,0 +1,42 @@
+﻿@{
+    ViewBag.Title = "غير مصرح";
+    Layout = "_Layout";
+}
+
+<div class="container">
+    <div class="row justify-content-center" style="margin-top: 100px; margin-bottom: 100px;">
+        <div class="col-md-6 text-center">
+            <div class="card shadow-lg">
+                <div class="card-body p-5">
+                    <i data-lucide="shield-alert" class="text-danger mb-4" style="width: 80px; height: 80px;"></i>
+                    <h2 class="fw-bold mt-4 mb-3">غير مصرح بالوصول</h2>
+                    <p class="text-muted lead mt-3 mb-4">
+                        عذراً، ليس لديك صلاحية للوصول إلى هذه الصفحة.
+                    </p>
+                    <p class="text-muted small">
+                        يرجى التأكد من أنك قمت بتسجيل الدخول بالحساب الصحيح.
+                    </p>
+                    <div class="mt-4 d-flex gap-2 justify-content-center">
+                        <a asp-controller="Front" asp-action="Home" class="btn btn-primary">
+                            <i data-lucide="home" class="ms-1" style="width: 16px; height: 16px;"></i>
+                            العودة للصفحة الرئيسية
+                        </a>
+                        <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-secondary">
+                                <i data-lucide="log-out" class="ms-1" style="width: 16px; height: 16px;"></i>
+                                تسجيل الخروج
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        lucide.createIcons();
+    </script>
+}

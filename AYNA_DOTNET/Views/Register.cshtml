@@ -1,0 +1,180 @@
+﻿@model Ayna.ViewModels.AuthVMs.RegisterViewModel
+@{
+    ViewBag.Title = "إنشاء حساب";
+    Layout = "_Layout";
+}
+
+<div class="container">
+    <div class="row justify-content-center mt-5 mb-5">
+        <div class="col-md-8 col-lg-7">
+            <div class="card shadow-lg auth-card">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <img src="~/logo.png" height="80" alt="أينع" class="mb-3">
+                        <h2 class="fw-bold">إنشاء حساب جديد</h2>
+                        <p class="text-muted">انضم إلى منصة أينع</p>
+                    </div>
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                {
+                                    <li>@error.ErrorMessage</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+
+                    <form asp-controller="Auth" asp-action="Register" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            <label asp-for="UserType" class="form-label"></label>
+                            <select asp-for="UserType" class="form-select" onchange="toggleFields()">
+                                <option value="">اختر نوع الحساب...</option>
+                                <option value="Farmer">مزارع - لديّ محاصيل لأشاركها</option>
+                                <option value="Donor">متبرع - أريد المساعدة</option>
+                                <option value="Charity">جمعية خيرية - أخدم المجتمعات</option>
+                            </select>
+                            <span asp-validation-for="UserType" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FirstName" class="form-label"></label>
+                                <div class="position-relative">
+                                    <i class="fas fa-user form-icon-rtl"></i>
+                                    <input asp-for="FirstName" class="form-control form-control-icon" placeholder="أحمد" />
+                                </div>
+                                <span asp-validation-for="FirstName" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LastName" class="form-label"></label>
+                                <div class="position-relative">
+                                    <i class="fas fa-user form-icon-rtl"></i>
+                                    <input asp-for="LastName" class="form-control form-control-icon" placeholder="محمد" />
+                                </div>
+                                <span asp-validation-for="LastName" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="UserEmail" class="form-label"></label>
+                            <div class="position-relative">
+                                <i class="fas fa-envelope form-icon-rtl"></i>
+                                <input asp-for="UserEmail" class="form-control form-control-icon" placeholder="example@email.com" />
+                            </div>
+                            <span asp-validation-for="UserEmail" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="UserPhone" class="form-label"></label>
+                            <div class="position-relative">
+                                <i class="fas fa-phone form-icon-rtl"></i>
+                                <input asp-for="UserPhone" class="form-control form-control-icon" placeholder="+966566193395 أو 0566193395" />
+                            </div>
+                            <span asp-validation-for="UserPhone" class="text-danger small"></span>
+                        </div>
+
+                        <div id="charityFields" style="display:none;">
+                            <div class="mb-3">
+                                <label asp-for="CharName" class="form-label"></label>
+                                <div class="position-relative">
+                                    <i class="fas fa-building form-icon-rtl"></i>
+                                    <input asp-for="CharName" class="form-control form-control-icon" placeholder="جمعية البر الخيرية" />
+                                </div>
+                                <span asp-validation-for="CharName" class="text-danger small"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="CharCR" class="form-label"></label>
+                                <div class="position-relative">
+                                    <i class="fas fa-registered form-icon-rtl"></i>
+                                    <input asp-for="CharCR" class="form-control form-control-icon" placeholder="1234567890" maxlength="10" />
+                                </div>
+                                <span asp-validation-for="CharCR" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Location" class="form-label" id="locationLabel"></label>
+                            <div class="position-relative">
+                                <i class="fas fa-map-marker-alt form-icon-rtl"></i>
+                                <input asp-for="Location" class="form-control form-control-icon" placeholder="الرياض، المملكة العربية السعودية" />
+                            </div>
+                            <span asp-validation-for="Location" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="UserPassword" class="form-label"></label>
+                            <div class="position-relative">
+                                <i class="fas fa-lock form-icon-rtl"></i>
+                                <input asp-for="UserPassword" class="form-control form-control-icon" placeholder="8 أحرف على الأقل" />
+                            </div>
+                            <span asp-validation-for="UserPassword" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="UserPasswordConfirmation" class="form-label"></label>
+                            <div class="position-relative">
+                                <i class="fas fa-lock form-icon-rtl"></i>
+                                <input asp-for="UserPasswordConfirmation" class="form-control form-control-icon" placeholder="أعد إدخال كلمة المرور" />
+                            </div>
+                            <span asp-validation-for="UserPasswordConfirmation" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input asp-for="AgreeToTerms" class="form-check-input" />
+                            <label asp-for="AgreeToTerms" class="form-check-label">
+                                أوافق على <a href="#" class="text-decoration-none">الشروط والأحكام</a>
+                            </label>
+                            <span asp-validation-for="AgreeToTerms" class="text-danger small d-block"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-green text-white w-100 py-2 fw-bold">
+                            إنشاء حساب
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <p class="text-muted mb-0">
+                            لديك حساب بالفعل؟
+                            <a asp-controller="Auth" asp-action="Login" class="fresh-green fw-bold text-decoration-none">تسجيل الدخول</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function toggleFields() {
+            var userType = document.querySelector('[name="UserType"]').value;
+            var charityFields = document.getElementById('charityFields');
+            var locationLabel = document.getElementById('locationLabel');
+            var charName = document.querySelector('[name="CharName"]');
+            var charCR = document.querySelector('[name="CharCR"]');
+
+            if (userType === 'Charity') {
+                charityFields.style.display = 'block';
+                locationLabel.textContent = 'موقع الجمعية';
+                if (charName) charName.required = true;
+                if (charCR) charCR.required = true;
+            } else {
+                charityFields.style.display = 'none';
+                locationLabel.textContent = userType === 'Farmer' ? 'موقع المزرعة' : 'العنوان';
+                if (charName) charName.required = false;
+                if (charCR) charCR.required = false;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleFields();
+            lucide.createIcons();
+        });
+    </script>
+}

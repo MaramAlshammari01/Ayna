@@ -1,0 +1,274 @@
+﻿@model Ayna.ViewModels.AuthVMs.CombinedAuthViewModel
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Login Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content auth-card">
+            <div class="modal-header border-0 pb-0 d-block text-center">
+                <button type="button" class="btn-close m-0 position-absolute" style="top: 1rem; left: 1rem;" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="d-flex align-items-center justify-content-center pt-3 mb-2">
+                    <img src="~/logo.png" height="100" alt="أينع">
+                </div>
+                <h2 class="card-title fw-bold">مرحباً بعودتك</h2>
+                <p class="card-text text-muted small">سجّل الدخول إلى حسابك للمتابعة</p>
+            </div>
+
+            <div class="modal-body pt-3">
+                <form asp-controller="Auth" asp-action="Login" method="post" class="needs-validation" novalidate>
+                    @Html.AntiForgeryToken()
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label asp-for="LoginUserEmail" class="form-label"></label>
+                        <div class="position-relative">
+                            <i class="fas fa-envelope form-icon-rtl"></i>
+                            <input type="email" class="form-control form-control-icon"
+                                   asp-for="LoginUserEmail" placeholder="أدخل بريدك الإلكتروني" required>
+                        </div>
+                        <span asp-validation-for="LoginUserEmail" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-4">
+                        <label asp-for="LoginUserPassword" class="form-label"></label>
+                        <div class="position-relative">
+                            <i class="fas fa-lock form-icon-rtl"></i>
+                            <input type="password" class="form-control form-control-icon"
+                                   asp-for="LoginUserPassword" placeholder="أدخل كلمة المرور" required>
+                        </div>
+                        <span asp-validation-for="LoginUserPassword" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Remember Me -->
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" asp-for="LoginRememberMe">
+                        <label class="form-check-label" asp-for="LoginRememberMe"></label>
+                    </div>
+
+                    <button type="submit" class="btn btn-green text-white w-100 py-2 fw-bold">
+                        تسجيل الدخول
+                    </button>
+                </form>
+
+                <div class="mt-4 text-center">
+                    <p class="text-muted small mb-0">
+                        ليس لديك حساب؟
+                        <a href="#" class="fresh-green fw-bold text-decoration-none"
+                           data-bs-toggle="modal" data-bs-target="#registerModal" data-bs-dismiss="modal">
+                            إنشاء حساب
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Register Modal -->
+<div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content auth-card">
+            <div class="modal-header border-0 pb-0 d-block text-center">
+                <button type="button" class="btn-close m-0 position-absolute" style="top: 1rem; left: 1rem;"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="d-flex align-items-center justify-content-center pt-3 mb-2">
+                    <img src="~/logo.png" height="100" alt="أينع">
+                </div>
+                <h2 class="card-title fw-bold">انضم إلينا</h2>
+                <p class="card-text text-muted small">أنشئ حسابك الجديد للبدء</p>
+            </div>
+
+            <div class="modal-body pt-3">
+                <form asp-controller="Auth" asp-action="Register" method="post" class="needs-validation" novalidate>
+                    @Html.AntiForgeryToken()
+
+                    <!-- User Type -->
+                    <div class="mb-3">
+                        <label asp-for="UserType" class="form-label"></label>
+                        <select class="form-select" asp-for="UserType" required onchange="toggleFields()">
+                            <option value="" disabled selected>اختر نوع الحساب...</option>
+                            <option value="Farmer">مزارع - لديّ محاصيل لأشاركها</option>
+                            <option value="Donor">متبرع - أريد المساعدة</option>
+                            <option value="Charity">جمعية خيرية - أخدم المجتمعات</option>
+                        </select>
+                        <span asp-validation-for="UserType" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Name -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="FirstName" class="form-label"></label>
+                            <div class="position-relative">
+                                <i class="fas fa-user form-icon-rtl"></i>
+                                <input type="text" class="form-control form-control-icon"
+                                       asp-for="FirstName" placeholder="أدخل اسمك الأول" required>
+                            </div>
+                            <span asp-validation-for="FirstName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="LastName" class="form-label"></label>
+                            <div class="position-relative">
+                                <i class="fas fa-user form-icon-rtl"></i>
+                                <input type="text" class="form-control form-control-icon"
+                                       asp-for="LastName" placeholder="أدخل اسم عائلتك" required>
+                            </div>
+                            <span asp-validation-for="LastName" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="mb-3">
+                        <label asp-for="UserPhone" class="form-label"></label>
+                        <div class="position-relative">
+                            <i class="fas fa-phone form-icon-rtl"></i>
+                            <input type="tel" class="form-control form-control-icon"
+                                   asp-for="UserPhone" placeholder="أدخل رقم هاتفك (مثال: +966566193395)" required>
+                        </div>
+                        <span asp-validation-for="UserPhone" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Charity Fields -->
+                    <div id="charityFields" style="display: none;">
+                        <div class="mb-3">
+                            <label asp-for="CharName" class="form-label"></label>
+                            <div class="position-relative">
+                                <i class="fas fa-building form-icon-rtl"></i>
+                                <input type="text" class="form-control form-control-icon"
+                                       asp-for="CharName" placeholder="أدخل اسم الجمعية">
+                            </div>
+                            <span asp-validation-for="CharName" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="CharCR" class="form-label"></label>
+                            <div class="position-relative">
+                                <i class="fas fa-registered form-icon-rtl"></i>
+                                <input type="text" class="form-control form-control-icon"
+                                       asp-for="CharCR" placeholder="أدخل رقم التسجيل (10 أرقام)">
+                            </div>
+                            <span asp-validation-for="CharCR" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="mb-3" id="locationGroup">
+                        <label asp-for="Location" class="form-label" id="locationLabel"></label>
+                        <div class="position-relative">
+                            <i class="fas fa-map-marker-alt form-icon-rtl"></i>
+                            <input type="text" class="form-control form-control-icon"
+                                   asp-for="Location" placeholder="أدخل عنوانك" required>
+                        </div>
+                        <span asp-validation-for="Location" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label asp-for="RegisterUserEmail" class="form-label"></label>
+                        <div class="position-relative">
+                            <i class="fas fa-envelope form-icon-rtl"></i>
+                            <input type="email" class="form-control form-control-icon"
+                                   asp-for="RegisterUserEmail" placeholder="أدخل بريدك الإلكتروني" required>
+                        </div>
+                        <span asp-validation-for="RegisterUserEmail" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-3">
+                        <label asp-for="RegisterUserPassword" class="form-label"></label>
+                        <div class="position-relative">
+                            <i class="fas fa-lock form-icon-rtl"></i>
+                            <input type="password" class="form-control form-control-icon"
+                                   asp-for="RegisterUserPassword" placeholder="أدخل كلمة المرور (8 أحرف على الأقل)" required>
+                        </div>
+                        <span asp-validation-for="RegisterUserPassword" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="mb-4">
+                        <label asp-for="RegisterUserPasswordConfirmation" class="form-label"></label>
+                        <div class="position-relative">
+                            <i class="fas fa-lock form-icon-rtl"></i>
+                            <input type="password" class="form-control form-control-icon"
+                                   asp-for="RegisterUserPasswordConfirmation" placeholder="أعد إدخال كلمة المرور" required>
+                        </div>
+                        <span asp-validation-for="RegisterUserPasswordConfirmation" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Terms Agreement -->
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" asp-for="AgreeToTerms" required>
+                        <label class="form-check-label" asp-for="AgreeToTerms">
+                            أوافق على <a href="#" class="text-decoration-none">الشروط والأحكام</a>
+                        </label>
+                        <span asp-validation-for="AgreeToTerms" class="text-danger small d-block"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-green text-white w-100 py-2 fw-bold">
+                        إنشاء حساب
+                    </button>
+                </form>
+
+                <div class="mt-4 text-center">
+                    <p class="text-muted small mb-0">
+                        لديك حساب بالفعل؟
+                        <a href="#" class="fresh-green fw-bold text-decoration-none"
+                           data-bs-toggle="modal" data-bs-target="#loginModal" data-bs-dismiss="modal">
+                            تسجيل الدخول
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleFields() {
+        const role = document.getElementById('UserType').value;
+        const charityFields = document.getElementById('charityFields');
+        const locationLabel = document.getElementById('locationLabel');
+        const charName = document.getElementById('CharName');
+        const charCr = document.getElementById('CharCR');
+
+        if (role === 'Charity') {
+            charityFields.style.display = 'block';
+            locationLabel.textContent = 'موقع الجمعية';
+            if (charName) charName.required = true;
+            if (charCr) charCr.required = true;
+        } else {
+            charityFields.style.display = 'none';
+            locationLabel.textContent = role === 'Farmer' ? 'موقع المزرعة' : 'العنوان';
+            if (charName) charName.required = false;
+            if (charCr) charCr.required = false;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleSelect = document.getElementById('UserType');
+        if (roleSelect) {
+            roleSelect.addEventListener('change', toggleFields);
+        }
+
+        // Show modals based on validation errors
+        @if (ViewData.ModelState.ErrorCount > 0)
+        {
+                var actionName = ViewContext.RouteData.Values["action"]?.ToString();
+                if (actionName == "Register")
+                {
+                        <text>
+                        var registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+                        registerModal.show();
+                        </text>
+                }
+                else if (actionName == "Login")
+                {
+                        <text>
+                        var loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                        loginModal.show();
+                        </text>
+                }
+        }
+    });
+</script>

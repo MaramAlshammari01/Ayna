@@ -1,0 +1,192 @@
+﻿@model Ayna.ViewModels.FarmerVMs.CropInventoryReportViewModel
+@{
+    ViewData["Title"] = "تقرير المخزون والصلاحية";
+    Layout = "~/Views/Shared/_LayoutFarmer.cshtml";
+}
+
+<div class="row mb-1">
+    <div class="col-12">
+        <h1 class="h2 fw-bold mb-0 text-earth-dark">تقرير المخزون والصلاحية</h1>
+        <p class="text-muted mb-0">تحليل شامل لمخزون المحاصيل وتواريخ الصلاحية</p>
+    </div>
+</div>
+
+<!-- Date Filter -->
+<div class="dashboard-box p-0 mb-1">
+    <!-- Alerts Section -->
+    @if (Model.ExpiringSoon > 0 || Model.Expired > 0)
+    {
+        <div class="dashboard-box mt-4">
+            <h4 class="h5 fw-bold text-fresh-green mb-4">تنبيهات المخزون</h4>
+
+            @if (Model.Expired > 0)
+            {
+                <div class="alert alert-danger">
+                    <div class="d-flex align-items-center">
+                        <i data-lucide="alert-circle" class="ms-2" style="width: 24px; height: 24px;"></i>
+                        <div>
+                            <h6 class="alert-heading mb-1">محاصيل منتهية الصلاحية</h6>
+                            <p class="mb-0">يوجد @Model.Expired محصول منتهي الصلاحية يحتاج إلى اتخاذ إجراء.</p>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (Model.ExpiringSoon > 0)
+            {
+                <div class="alert alert-warning">
+                    <div class="d-flex align-items-center">
+                        <i data-lucide="alert-triangle" class="ms-2" style="width: 24px; height: 24px;"></i>
+                        <div>
+                            <h6 class="alert-heading mb-1">محاصيل قريبة من الانتهاء</h6>
+                            <p class="mb-0">يوجد @Model.ExpiringSoon محصول سينتهي خلال 7 أيام. يفضل التبرع بها أو استخدامها في السلال.</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <form method="get" asp-controller="Report" asp-action="CropInventoryReport">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label for="startDate" class="form-label">من تاريخ</label>
+                <input type="date" class="form-control" id="startDate" name="startDate" value="@Model.StartDate.ToString("yyyy-MM-dd")">
+            </div>
+            <div class="col-md-4">
+                <label for="endDate" class="form-label">إلى تاريخ</label>
+                <input type="date" class="form-control" id="endDate" name="endDate" value="@Model.EndDate.ToString("yyyy-MM-dd")">
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-fresh-green w-100">تطبيق الفلتر</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-1">
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="dashboard-box text-center">
+            <i data-lucide="carrot" class="text-fresh-green mb-2" style="width: 40px; height: 40px;"></i>
+            <h3 class="fw-bold">@Model.TotalCrops</h3>
+            <p class="text-muted mb-0">إجمالي المحاصيل</p>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="dashboard-box text-center">
+            <i data-lucide="alert-triangle" class="text-warning mb-2" style="width: 40px; height: 40px;"></i>
+            <h3 class="fw-bold">@Model.ExpiringSoon</h3>
+            <p class="text-muted mb-0">قريبة من الانتهاء</p>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="dashboard-box text-center">
+            <i data-lucide="x-circle" class="text-danger mb-2" style="width: 40px; height: 40px;"></i>
+            <h3 class="fw-bold">@Model.Expired</h3>
+            <p class="text-muted mb-0">منتهية الصلاحية</p>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="dashboard-box text-center">
+            <i data-lucide="package" class="text-info mb-2" style="width: 40px; height: 40px;"></i>
+            <h3 class="fw-bold">@Model.TotalQuantity</h3>
+            <p class="text-muted mb-0">الكمية الإجمالية</p>
+        </div>
+    </div>
+</div>
+
+<!-- Crops Table -->
+<div class="dashboard-box">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="h5 fw-bold text-fresh-green mb-0">تفاصيل المخزون</h4>
+        <a asp-controller="Report" asp-action="ExportCropInventory" 
+           asp-route-startDate="@Model.StartDate.ToString("yyyy-MM-dd")" 
+           asp-route-endDate="@Model.EndDate.ToString("yyyy-MM-dd")" 
+           class="btn btn-sm btn-outline-fresh-green">
+            <i data-lucide="download" class="ms-2" style="width: 16px; height: 16px;"></i>
+            تصدير CSV
+        </a>
+    </div>
+
+    @if (Model.Crops.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>اسم المحصول</th>
+                        <th>النوع</th>
+                        <th>الكمية الإجمالية</th>
+                        <th>المستخدم في السلال</th>
+                        <th>المتبقي</th>
+                        <th>تاريخ الانتهاء</th>
+                        <th>الأيام المتبقية</th>
+                        <th>الحالة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var crop in Model.Crops.Select((c, index) => new { Crop = c, Index = index }))
+                    {
+                        <tr>
+                            <td>@(crop.Index + 1)</td>
+                            <td><strong>@crop.Crop.CropName</strong></td>
+                            <td>@crop.Crop.CropType</td>
+                            <td>@crop.Crop.Quantity @crop.Crop.Unit</td>
+                            <td>@crop.Crop.UsedInBaskets @crop.Crop.Unit</td>
+                            <td>
+                                <span class="@(crop.Crop.RemainingQuantity < 10 ? "text-danger fw-bold" : "")">
+                                    @crop.Crop.RemainingQuantity @crop.Crop.Unit
+                                </span>
+                            </td>
+                            <td>@crop.Crop.ExpiredAt.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                @if (crop.Crop.DaysUntilExpiry < 0)
+                                {
+                                    <span class="text-danger">-@Math.Abs(crop.Crop.DaysUntilExpiry)</span>
+                                }
+                                else
+                                {
+                                    @crop.Crop.DaysUntilExpiry
+                                }
+                            </td>
+                            <td>
+                                <span class="badge @(crop.Crop.ExpiryStatus switch {
+                                    "expired" => "bg-danger",
+                                    "expiring_soon" => "bg-warning",
+                                    "expiring_later" => "bg-info",
+                                    _ => "bg-success"
+                                })">
+                                    @(crop.Crop.ExpiryStatus switch {
+                                        "expired" => "منتهي",
+                                        "expiring_soon" => "قريب الانتهاء",
+                                        "expiring_later" => "ينتهي قريباً",
+                                        _ => "جيد"
+                                    })
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i data-lucide="carrot" class="text-muted mb-3" style="width: 64px; height: 64px;"></i>
+            <h5 class="text-muted">لا توجد محاصيل مسجلة</h5>
+            <p class="text-muted">ابدأ بإضافة محاصيل إلى مزرعتك</p>
+            <a asp-controller="Crop" asp-action="Index" class="btn btn-fresh-green">
+                إضافة محاصيل جديدة
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        lucide.createIcons();
+    </script>
+}

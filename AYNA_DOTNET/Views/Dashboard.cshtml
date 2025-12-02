@@ -1,0 +1,131 @@
+﻿@model Ayna.ViewModels.FarmerVMs.FarmerDashboardViewModel
+@{
+    ViewData["Title"] = "لوحة تحكم المزارع";
+    Layout = "~/Views/Shared/_LayoutFarmer.cshtml";
+}
+
+<!-- Welcome Section -->
+<div class="row mb-4 align-items-center">
+    <div class="col-12 col-lg-8">
+        <h1 class="h2 fw-bold mb-0 text-earth-dark">مرحباً بك، @Model.Farmer.FarFirstName @Model.Farmer.FarLastName!</h1>
+        <p class="text-muted mb-0">
+            <i data-lucide="shield" class="ms-1" style="width: 16px; height: 16px;"></i>
+            نوع المستخدم: <span class="fw-semibold">مزارع</span> | ID: <span class="small">@Model.Farmer.FarId</span>
+        </p>
+    </div>
+    <div class="col-12 col-lg-4 text-lg-start mt-3 mt-lg-0">
+        <div class="d-flex justify-content-lg-start justify-content-center">
+            <span class="badge bg-fresh-green fs-6">لوحة التحكم</span>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="dashboard-box text-center">
+            <i data-lucide="carrot" class="text-fresh-green mb-2" style="width: 40px; height: 40px;"></i>
+            <h3 class="fw-bold">@Model.TotalCrops</h3>
+            <p class="text-muted mb-0">إجمالي المحاصيل</p>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="dashboard-box text-center">
+            <i data-lucide="shopping-basket" class="text-harvest-gold mb-2" style="width: 40px; height: 40px;"></i>
+            <h3 class="fw-bold">@Model.ActiveBaskets</h3>
+            <p class="text-muted mb-0">السلال النشطة</p>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="dashboard-box text-center">
+            <i data-lucide="heart" class="text-danger mb-2" style="width: 40px; height: 40px;"></i>
+            <h3 class="fw-bold">@Model.PendingDonations</h3>
+            <p class="text-muted mb-0">طلبات التبرع</p>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="dashboard-box text-center">
+            <i data-lucide="package" class="text-primary mb-2" style="width: 40px; height: 40px;"></i>
+            <h3 class="fw-bold">@Model.CompletedOrders</h3>
+            <p class="text-muted mb-0">الطلبات المكتملة</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Crops -->
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-box">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="h5 fw-bold text-fresh-green mb-0">أحدث المحاصيل</h4>
+                <a asp-controller="Crop" asp-action="Index" class="btn btn-sm btn-outline-fresh-green">عرض الكل</a>
+            </div>
+
+            @if (Model.RecentCrops.Any())
+            {
+                <div class="list-group list-group-flush">
+                    @foreach (var crop in Model.RecentCrops)
+                    {
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">@crop.CroName</h6>
+                                <small class="text-muted">@crop.CroType - @crop.CroQuantity @crop.CroUnit</small>
+                            </div>
+                            <span class="badge bg-light text-dark">@crop.CroShelfLife</span>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="text-muted text-center py-3">لا توجد محاصيل مضافة بعد</p>
+            }
+        </div>
+    </div>
+
+    <!-- Recent Donations -->
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-box">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="h5 fw-bold text-fresh-green mb-0">أحدث التبرعات</h4>
+                <a asp-controller="Donation" asp-action="Index" class="btn btn-sm btn-outline-fresh-green">عرض الكل</a>
+            </div>
+
+            @if (Model.RecentDonations.Any())
+            {
+                <div class="list-group list-group-flush">
+                    @foreach (var donation in Model.RecentDonations)
+                    {
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">تبرع #@donation.DonId</h6>
+                                    <small class="text-muted">
+                                        @string.Join(", ", donation.DonationCrops.Select(dc => $"{dc.Cro.CroName} ({dc.DcQuantity})"))
+                                    </small>
+                                </div>
+                                <span class="badge
+                                            @(donation.DonStatus == "Pending" ? "bg-warning" :
+                                                                            donation.DonStatus == "Approved" ? "bg-success" :
+                                                                            donation.DonStatus == "Delivered" ? "bg-info" : "bg-secondary")">
+                            @donation.DonStatus
+                        </span>
+                    </div>
+                    <small class="text-muted">@donation.DonDate.ToString("yyyy-MM-dd")</small>
+                </div>
+                                }
+                </div>
+            }
+            else
+            {
+                <p class="text-muted text-center py-3">لا توجد تبرعات حتى الآن</p>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        lucide.createIcons();
+    </script>
+}

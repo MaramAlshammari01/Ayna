@@ -1,0 +1,159 @@
+﻿@model Ayna.ViewModels.DonorVMs.SpendingSummaryReportViewModel
+@{
+    ViewData["Title"] = "ملخص الإنفاق";
+    Layout = "~/Views/Shared/_DonorLayout.cshtml";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 fw-bold mb-0 text-dark">ملخص الإنفاق</h1>
+                <p class="text-muted mb-0">تحليل إنفاقك الشهري وتوزيع التبرعات</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Section -->
+<div class="dashboard-box mb-4">
+    <h5 class="fw-bold text-primary mb-3">فلترة الفترة</h5>
+    <form method="get" asp-action="SpendingSummaryReport" asp-controller="Report" asp-area="Donor">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label for="startDate" class="form-label">من تاريخ</label>
+                <input type="date" class="form-control" id="startDate" name="startDate"
+                       value="@Model.StartDate?.ToString("yyyy-MM-dd")">
+            </div>
+            <div class="col-md-4">
+                <label for="endDate" class="form-label">إلى تاريخ</label>
+                <input type="date" class="form-control" id="endDate" name="endDate"
+                       value="@Model.EndDate?.ToString("yyyy-MM-dd")">
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <div class="d-flex gap-2 w-100">
+                    <button type="submit" class="btn btn-primary flex-grow-1">تطبيق الفلترة</button>
+                    <a asp-action="SpendingSummaryReport" asp-controller="Report" asp-area="Donor"
+                       class="btn btn-outline-secondary">إعادة تعيين</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card border-0 shadow-sm bg-primary text-white">
+            <div class="card-body text-center">
+                <h3 class="fw-bold">@Model.TotalOrders</h3>
+                <p class="mb-0">إجمالي التبرعات</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card border-0 shadow-sm bg-success text-white">
+            <div class="card-body text-center">
+                <h3 class="fw-bold">@Model.TotalSpent.ToString("N2") ر.س</h3>
+                <p class="mb-0">إجمالي المنصرف</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card border-0 shadow-sm bg-info text-white">
+            <div class="card-body text-center">
+                <h3 class="fw-bold">@(Model.MonthlySummary?.Count ?? 0)</h3>
+                <p class="mb-0">عدد الأشهر</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Monthly Summary -->
+<div class="dashboard-box mb-4">
+    <h5 class="fw-bold text-primary mb-3">التوزيع الشهري</h5>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>الشهر</th>
+                    <th>عدد التبرعات</th>
+                    <th>المبلغ الإجمالي</th>
+                    <th>متوسط التبرع</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.MonthlySummary != null && Model.MonthlySummary.Any())
+                {
+                    @foreach (var month in Model.MonthlySummary)
+                    {
+                        var average = month.Count > 0 ? month.Total / month.Count : 0;
+                        <tr>
+                            <td class="fw-bold">@month.MonthName</td>
+                            <td>@month.Count</td>
+                            <td class="text-success fw-bold">@month.Total.ToString("N2") ر.س</td>
+                            <td class="text-info">@average.ToString("N2") ر.س</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center py-4">
+                            <i data-lucide="bar-chart-3" class="text-muted mb-2" style="width: 48px; height: 48px;"></i>
+                            <p class="text-muted mb-0">لا توجد بيانات لعرضها</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Charity Summary -->
+<div class="dashboard-box">
+    <h5 class="fw-bold text-primary mb-3">التوزيع حسب الجمعيات</h5>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>الجمعية</th>
+                    <th>عدد التبرعات</th>
+                    <th>المبلغ الإجمالي</th>
+                    <th>النسبة</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.CharitySummary != null && Model.CharitySummary.Any())
+                {
+                    @foreach (var charity in Model.CharitySummary)
+                    {
+                        var percentage = Model.TotalSpent > 0 ? (charity.Total / Model.TotalSpent) * 100 : 0;
+                        <tr>
+                            <td class="fw-bold">@charity.CharityName</td>
+                            <td>@charity.Count</td>
+                            <td class="text-success fw-bold">@charity.Total.ToString("N2") ر.س</td>
+                            <td class="text-info">@percentage.ToString("N1")%</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center py-4">
+                            <i data-lucide="heart" class="text-muted mb-2" style="width: 48px; height: 48px;"></i>
+                            <p class="text-muted mb-0">لا توجد بيانات لعرضها</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+}

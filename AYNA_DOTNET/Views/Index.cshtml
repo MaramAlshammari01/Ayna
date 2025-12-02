@@ -1,0 +1,410 @@
+﻿@model Ayna.ViewModels.FarmerVMs.DonationIndexViewModel
+@{
+    ViewData["Title"] = "طلبات التبرع";
+    Layout = "~/Views/Shared/_LayoutFarmer.cshtml";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h2 fw-bold mb-0 text-earth-dark">طلبات التبرع</h1>
+        <p class="text-muted mb-0">إدارة طلبات التبرع بالمحاصيل للجمعيات الخيرية</p>
+    </div>
+</div>
+
+<div class="dashboard-box">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="h5 fw-bold text-fresh-green mb-0">سجل طلبات التبرع</h4>
+        <button class="btn btn-sm btn-fresh-green" data-bs-toggle="modal" data-bs-target="#donationModal">
+            <i data-lucide="plus" class="ms-2" style="width: 16px; height: 16px;"></i>
+            طلب تبرع جديد
+        </button>
+    </div>
+
+    @if (Model.Donations.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>رقم التبرع</th>
+                        <th>تاريخ الطلب</th>
+                        <th>الجمعية المستهدفة</th>
+                        <th>المحاصيل المتبرع بها</th>
+                        <th>حالة التبرع</th>
+                        <th>رد الجمعية</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var donation in Model.Donations.Select((d, index) => new { Donation = d, Index = index }))
+                    {
+                        var latestRequest = donation.Donation.DonatReqs.OrderByDescending(r => r.AddedAt).FirstOrDefault();
+                        <tr>
+                            <td>@(donation.Index + 1)</td>
+                            <td>#@donation.Donation.DonId</td>
+                            <td>@donation.Donation.DonDate.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                @if (donation.Donation.DonatReqs.Any())
+                                {
+                                    @foreach (var request in donation.Donation.DonatReqs)
+                                    {
+                                        <span class="badge bg-light text-dark mb-1 d-block">
+                                            @(request.Char?.CharName ?? "غير محدد")
+                                        </span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-muted">لم يتم إرساله</span>
+                                }
+                            </td>
+                            <td>
+                                @foreach (var donationCrop in donation.Donation.DonationCrops)
+                                {
+                                    <span class="badge bg-light text-dark mb-1">
+                                        @donationCrop.Cro.CroName (@donationCrop.DcQuantity)
+                                    </span>
+                                }
+                            </td>
+                            <td>
+                                <span class="badge @(donation.Donation.DonStatus switch {
+                                    "Pending" => "bg-warning",
+                                    "Approved" => "bg-success",
+                                    "Delivered" => "bg-info",
+                                    "Cancelled" => "bg-danger",
+                                    _ => "bg-secondary"
+                                })">
+                                    @donation.Donation.DonStatus
+                                </span>
+                            </td>
+                            <td>
+                                @if (latestRequest != null)
+                                {
+                                    <span class="badge @(latestRequest.ReqStatus switch {
+                                        "Pending" => "bg-warning",
+                                        "Accepted" => "bg-success",
+                                        "Rejected" => "bg-danger",
+                                        "Completed" => "bg-info",
+                                        _ => "bg-secondary"
+                                    })">
+                                        @(latestRequest.ReqStatus switch {
+                                            "Pending" => "بانتظار الرد",
+                                            "Accepted" => "موافق",
+                                            "Rejected" => "مرفوض",
+                                            "Completed" => "مكتمل",
+                                            _ => latestRequest.ReqStatus
+                                        })
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-sm btn-outline-info" onclick="viewDonationDetails(@donation.Donation.DonId)" title="عرض التفاصيل">
+                                        <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+                                    </button>
+
+                                    <button class="btn btn-sm btn-outline-warning" onclick="assignToNewCharity(@donation.Donation.DonId)" title="تعيين لجمعية جديدة">
+                                        <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
+                                    </button>
+
+                                    @if (donation.Donation.DonStatus == "Pending")
+                                    {
+                                        <form asp-controller="Donation" asp-action="UpdateStatus" asp-route-id="@donation.Donation.DonId" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="DonStatus" value="Cancelled">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('هل أنت متأكد من إلغاء هذا التبرع؟')" title="إلغاء التبرع">
+                                                <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i data-lucide="heart" class="text-muted mb-3" style="width: 64px; height: 64px;"></i>
+            <h5 class="text-muted">لا توجد طلبات تبرع حتى الآن</h5>
+            <p class="text-muted">ابدأ بإنشاء أول طلب تبرع لمحاصيلك</p>
+            <button class="btn btn-fresh-green" data-bs-toggle="modal" data-bs-target="#donationModal">
+                إنشاء طلب تبرع
+            </button>
+        </div>
+    }
+</div>
+
+<!-- Donation Modal -->
+<div class="modal fade" id="donationModal" tabindex="-1" aria-labelledby="donationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="donationModalLabel">طلب تبرع جديد</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" asp-controller="Donation" asp-action="Create">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="CharId" class="form-label">اختر الجمعية الخيرية</label>
+                            <select class="form-select" id="CharId" name="CharId" required>
+                                <option value="">اختر الجمعية...</option>
+                                @foreach (var charity in Model.Charities)
+                                {
+                                    <option value="@charity.CharId">@charity.CharName</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="PickupDuration" class="form-label">مدة الاستعداد للاستلام</label>
+                            <select class="form-select" id="PickupDuration" name="PickupDuration" required>
+                                <option value="">اختر المدة...</option>
+                                <option value="Same Day">نفس اليوم</option>
+                                <option value="1-2 Days">1-2 أيام</option>
+                                <option value="3-5 Days">3-5 أيام</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="DonDescription" class="form-label">وصف التبرع</label>
+                        <textarea class="form-control" id="DonDescription" name="DonDescription" rows="3" placeholder="وصف تفصيلي للمحاصيل المتبرع بها..." required></textarea>
+                    </div>
+
+                    <h6 class="mt-3 mb-2 fw-semibold">محاصيل التبرع:</h6>
+
+                    <div id="donationCropsSelection" class="row g-3">
+                        @foreach (var crop in Model.AvailableCrops)
+                        {
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card shadow-sm h-100 border-0" data-crop-card="@crop.CroId">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="card-title fw-bold text-fresh-green mb-0 d-flex align-items-center">
+                                                <i data-lucide="carrot" class="ms-2" style="width: 20px; height: 20px;"></i>
+                                                @crop.CroName
+                                            </h6>
+                                            <span class="badge bg-secondary-subtle text-muted fw-normal p-2">
+                                                @crop.CroQuantity كغم متاح
+                                            </span>
+                                        </div>
+
+                                        <label for="quantity-@crop.CroId" class="form-label small text-muted">الكمية المراد وضعها في السلة:</label>
+                                        <div class="input-group input-group-sm">
+                                            <button class="btn btn-outline-secondary btn-sm quantity-btn" type="button" data-action="decrement" data-target="#quantity-@crop.CroId">
+                                                <i data-lucide="minus" style="width: 16px; height: 16px;"></i>
+                                            </button>
+
+                                            <input type="number" class="form-control text-center donation-quantity"
+                                                   id="quantity-@crop.CroId"
+                                                   data-crop-id="@crop.CroId"
+                                                   data-crop-name="@crop.CroName"
+                                                   placeholder="0"
+                                                   min="0" max="@crop.CroQuantity" value="0">
+
+                                            <button class="btn btn-outline-secondary btn-sm quantity-btn" type="button" data-action="increment" data-target="#quantity-@crop.CroId">
+                                                <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+                                            </button>
+
+                                            <span class="input-group-text bg-light text-muted">كغم</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="alert alert-info mt-3">
+                        <i data-lucide="info" class="ms-2" style="width: 16px; height: 16px;"></i>
+                        <small>سيتم حجز الكميات المحددة حتى يتم الرد على طلب التبرع من قبل الجمعية.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-fresh-green">إرسال طلب التبرع</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Donation Details Modal -->
+<div class="modal fade" id="donationDetailsModal" tabindex="-1" aria-labelledby="donationDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="donationDetailsModalLabel">تفاصيل التبرع</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="donationDetailsContent">
+                <!-- Content will be loaded via AJAX -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assign to New Charity Modal -->
+<div class="modal fade" id="assignCharityModal" tabindex="-1" aria-labelledby="assignCharityModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assignCharityModalLabel">تعيين التبرع لجمعية جديدة</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="assignCharityForm" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <input type="hidden" id="assign_donation_id" name="donation_id">
+                    <div class="mb-3">
+                        <label for="new_CharId" class="form-label">اختر الجمعية الخيرية الجديدة</label>
+                        <select class="form-select" id="new_CharId" name="CharId" required>
+                            <option value="">اختر الجمعية...</option>
+                            @foreach (var charity in Model.Charities)
+                            {
+                                <option value="@charity.CharId">@charity.CharName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new_PickupDuration" class="form-label">مدة الاستعداد للاستلام</label>
+                        <select class="form-select" id="new_PickupDuration" name="PickupDuration" required>
+                            <option value="">اختر المدة...</option>
+                            <option value="Same Day">نفس اليوم</option>
+                            <option value="1-2 Days">1-2 أيام</option>
+                            <option value="3-5 Days">3-5 أيام</option>
+                        </select>
+                    </div>
+                    <div class="alert alert-warning">
+                        <i data-lucide="alert-triangle" class="ms-2" style="width: 16px; height: 16px;"></i>
+                        <small>سيتم إرسال هذا التبرع للجمعية الجديدة وسيتم إخطارها بطلبه.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-fresh-green">تعيين للجمعية</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function viewDonationDetails(donationId) {
+            document.getElementById('donationDetailsContent').innerHTML = `
+                <div class="text-center py-4">
+                    <div class="spinner-border text-fresh-green" role="status">
+                        <span class="visually-hidden">جاري التحميل...</span>
+                    </div>
+                    <p class="mt-2 text-muted">جاري تحميل التفاصيل...</p>
+                </div>
+            `;
+
+            fetch(`/Farmer/Donation/Details/${donationId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const donation = data.donation;
+                        const requests = data.requests;
+
+                        let content = `<div class="row"><div class="col-md-6">
+                            <h6 class="fw-bold">معلومات التبرع:</h6>
+                            <p><strong>رقم التبرع:</strong> #${donation.id}</p>
+                            <p><strong>التاريخ:</strong> ${new Date(donation.date).toLocaleDateString('ar-SA')}</p>
+                            <p><strong>الحالة:</strong> <span class="badge bg-success">${donation.status}</span></p>
+                            <p><strong>الوصف:</strong> ${donation.description}</p>
+                        </div><div class="col-md-6">
+                            <h6 class="fw-bold">المحاصيل المتبرع بها:</h6>`;
+
+                        donation.crops.forEach(crop => {
+                            content += `<div class="border rounded p-2 mb-2">
+                                <strong>${crop.cropName}</strong><br>
+                                <small>الكمية: ${crop.quantity} ${crop.unit}</small>
+                            </div>`;
+                        });
+
+                        content += `</div></div>`;
+                        document.getElementById('donationDetailsContent').innerHTML = content;
+                        lucide.createIcons();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            new bootstrap.Modal(document.getElementById('donationDetailsModal')).show();
+        }
+
+        function assignToNewCharity(donationId) {
+            document.getElementById('assign_donation_id').value = donationId;
+            document.getElementById('assignCharityForm').action = `/Farmer/Donation/AssignToCharity/${donationId}`;
+            document.getElementById('new_CharId').value = '';
+            document.getElementById('new_PickupDuration').value = '';
+            new bootstrap.Modal(document.getElementById('assignCharityModal')).show();
+        }
+
+        // Handle form submission - convert crop inputs to array
+        document.querySelector('form[action*="Create"]').addEventListener('submit', function(e) {
+            const crops = [];
+            document.querySelectorAll('.donation-quantity').forEach(input => {
+                const quantity = parseInt(input.value) || 0;
+                if (quantity > 0) {
+                    crops.push({
+                        CropId: parseInt(input.getAttribute('data-crop-id')),
+                        Quantity: quantity
+                    });
+                }
+            });
+
+            if (crops.length === 0) {
+                e.preventDefault();
+                alert('يجب تحديد كميات المحاصيل للتبرع');
+                return;
+            }
+
+            const cropsInput = document.createElement('input');
+            cropsInput.type = 'hidden';
+            cropsInput.name = 'Crops';
+            cropsInput.value = JSON.stringify(crops);
+            this.appendChild(cropsInput);
+        });
+
+        // Plus/Minus buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.quantity-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const input = document.querySelector(targetId);
+                    let currentValue = parseInt(input.value) || 0;
+                    const action = this.getAttribute('data-action');
+                    const max = parseInt(input.max);
+
+                    if (action === 'increment') {
+                        if (currentValue < max) {
+                            input.value = currentValue + 1;
+                        }
+                    } else if (action === 'decrement') {
+                        if (currentValue > 0) {
+                            input.value = currentValue - 1;
+                        }
+                    }
+                });
+            });
+
+            lucide.createIcons();
+        });
+    </script>
+}

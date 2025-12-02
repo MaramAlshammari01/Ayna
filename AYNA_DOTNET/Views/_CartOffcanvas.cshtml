@@ -1,0 +1,159 @@
+﻿
+<!-- Cart Offcanvas -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="cartOffcanvas" aria-labelledby="cartOffcanvasLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="cartOffcanvasLabel">سلة التسوق</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div id="cartItemsContainer">
+            <div class="text-center py-4">
+                <i data-lucide="shopping-cart" class="text-muted mb-3" style="width: 48px; height: 48px;"></i>
+                <p class="text-muted">سلة التسوق فارغة</p>
+            </div>
+        </div>
+        <div class="mt-3 pt-3 border-top" id="cartSummary" style="display: none;">
+            <div class="d-flex justify-content-between mb-2">
+                <span>الإجمالي:</span>
+                <strong id="cartTotal">0 ر.س</strong>
+            </div>
+            <button class="btn btn-primary w-100" onclick="proceedToDonation()">المتابعة للتبرع</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function loadCart() {
+            fetch('@Url.Action("GetCartData", "Cart", new { area = "Donor" })')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updateCartDisplay(data.data.cart, data.data.total);
+                        updateCartCount(data.data.count);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading cart:', error);
+                });
+        }
+
+        function updateCartDisplay(cart, total) {
+            const container = document.getElementById('cartItemsContainer');
+            const summary = document.getElementById('cartSummary');
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-4">
+                        <i data-lucide="shopping-cart" class="text-muted mb-3" style="width: 48px; height: 48px;"></i>
+                        <p class="text-muted">سلة التسوق فارغة</p>
+                    </div>
+                `;
+                summary.style.display = 'none';
+            } else {
+                container.innerHTML = cart.map(item => `
+                    <div class="cart-item mb-3 pb-3 border-bottom">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">${item.name}</h6>
+                                <p class="text-muted small mb-1">${item.farmerName}</p>
+                                <p class="text-primary fw-bold">${parseFloat(item.price).toFixed(2)} ر.س × ${item.quantity}</p>
+                            </div>
+                            <button class="btn btn-sm btn-outline-danger" onclick="removeFromCart(${item.basketId})">
+                                <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                            </button>
+                        </div>
+                        <div class="d-flex align-items-center mt-2">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="updateQuantity(${item.basketId}, ${item.quantity - 1})" ${item.quantity <= 1 ? 'disabled' : ''}>
+                                <i data-lucide="minus" style="width: 12px; height: 12px;"></i>
+                            </button>
+                            <span class="mx-2">${item.quantity}</span>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="updateQuantity(${item.basketId}, ${item.quantity + 1})">
+                                <i data-lucide="plus" style="width: 12px; height: 12px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+                document.getElementById('cartTotal').textContent = `${parseFloat(total).toFixed(2)} ر.س`;
+                summary.style.display = 'block';
+            }
+
+            lucide.createIcons();
+        }
+
+        function removeFromCart(basketId) {
+            fetch(`@Url.Action("RemoveFromCart", "Cart", new { area = "Donor" })/${basketId}`, {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message, true);
+                        updateCartCount(data.data.cart_count);
+                        loadCart();
+                    } else {
+                        showToast(data.message, false);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('حدث خطأ أثناء إزالة السلة', false);
+                });
+        }
+
+        function updateQuantity(basketId, newQuantity) {
+            if (newQuantity < 1) return;
+
+            fetch(`@Url.Action("UpdateCartQuantity", "Cart", new { area = "Donor" })/${basketId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: JSON.stringify({ quantity: newQuantity })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        loadCart();
+                    } else {
+                        showToast(data.message, false);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('حدث خطأ أثناء تحديث الكمية', false);
+                });
+        }
+
+        function updateCartCount(count) {
+            const cartCountEl = document.getElementById('cartCount');
+            if (cartCountEl) {
+                cartCountEl.textContent = count;
+            }
+        }
+
+        function showToast(message, isSuccess) {
+            // You can implement a proper toast notification here
+            // For now, using a simple alert
+            if (typeof toastr !== 'undefined') {
+                if (isSuccess) {
+                    toastr.success(message);
+                } else {
+                    toastr.error(message);
+                }
+            } else {
+                alert(message);
+            }
+        }
+
+        // Load cart when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCart();
+        });
+    </script>
+}
